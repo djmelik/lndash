@@ -1,0 +1,29 @@
+<!doctype html>
+{% extends "layout.html" %}
+{% block body %}
+<div class="ui container">
+  <div class="ui segments">
+    <h4 class="ui top sub attached header">Overview</h4>
+    <div class="ui attached segment">
+      <form method="POST">
+        <div class="ui fluid search selection dropdown">
+          <input type="hidden" name="node-result">
+          <i class="dropdown icon"></i>
+          <div class="default text">Select Node</div>
+          <div class="menu">
+            {% for node in nodes %}
+            <div class="item" data-value="{{ node.pub_key }}"><i class="stop icon" style="color: {{ node.color }}"></i>{{ node.alias }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <script>$('.ui.dropdown').dropdown();</script>
+        <div class="ui divider"></div>
+        <div class="ui fluid action input">
+          <input type="text" name="amount" placeholder="Enter Amount (in sats)">
+          <button class="ui button" type="submit">Search</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

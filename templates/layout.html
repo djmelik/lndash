@@ -1,0 +1,47 @@
+<!doctype html>
+<head>
+  <title>Lightning Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="/static/semantic.min.css">
+  <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous">
+  </script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="/static/semantic.min.js"></script>
+  <style type="text/css">
+    body {
+      background-color: #FFFFFF;
+    }
+    .ui.menu .item img.logo {
+      margin-right: 1.5em;
+    }
+    .main.container {
+      margin-top: 5em;
+    }
+    .wireframe {
+      margin-top: 2em;
+    }
+    .ui.footer.segment {
+      margin: 5em 0em 0em;
+      padding: 5em 0em;
+    }
+  </style>
+</head>
+<body>
+  <div class="ui fixed inverted menu">
+    <div class="ui container">
+      <div class="header item">Lightning Dashboard</div>
+      <a href="/" class="item">Home</a>
+      <a href="channels" class="item">Channels</a>
+      <a href="events" class="item">Events</a>
+      <a href="query" class="item">Query</a>
+    </div>
+  </div>
+  <div class="ui main container">
+  {% block body %}
+  {% endblock %}
+  </div>
+</body>

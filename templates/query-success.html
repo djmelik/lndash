@@ -1,0 +1,64 @@
+<!doctype html>
+{% extends "layout.html" %}
+{% block body %}
+<div class="ui container">
+  <div class="ui segments">
+    <h4 class="ui top sub attached header">Overview</h4>
+    <div class="ui attached segment">
+      <form method="POST">
+        <div class="ui fluid search selection dropdown">
+          <input type="hidden" name="node-result">
+          <i class="dropdown icon"></i>
+          <div class="default text">Select Node</div>
+          <div class="menu">
+            {% for node in nodes %}
+            <div class="item" data-value="{{ node.pub_key }}"><i class="stop icon" style="color: {{ node.color }}"></i>{{ node.alias }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <script>$('.ui.dropdown').dropdown();</script>
+        <div class="ui divider"></div>
+        <div class="ui fluid action input">
+          <input type="text" name="amount" placeholder="Enter Amount (in sats)">
+          <button class="ui button" type="submit">Search</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  {% for route in routes %}
+  <div class="ui segments">
+    <h4 class="ui top sub attached header">Route #{{ loop.index }}</h4>
+    <div class="ui attached segment">
+      <table class="ui compact table">
+        <thead>
+          <tr>
+            <th>Hop</th>
+            <th>Channel</th>
+            <th>Node</th>
+            <th>Capacity</th>
+            <th>Forward (sat)</th>
+            <th>Fee (sat)</th>
+            <th>Forward (msat)</th>
+            <th>Fee (msat)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for hop in route.hops %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ hop.chan_id }}</td>
+            <td>{{ hop.pub_key }}</td>
+            <td>{{ hop.chan_capacity }}</td>
+            <td>{{ hop.amt_to_forward }}</td>
+            <td>{{ hop.fee }}</td>
+            <td>{{ hop.amt_to_forward_msat }}</td>
+            <td>{{ hop.fee_msat }}</td>
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

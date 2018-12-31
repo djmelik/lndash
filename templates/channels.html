@@ -1,0 +1,239 @@
+<!doctype html>
+{% extends "layout.html" %}
+{% block body %}
+<div class="ui container">
+  <div class="ui segments">
+    <h4 class="ui top sub attached header">Overview</h4>
+    <div class="ui attached segment">
+      <div class="ui grid">
+        <div class="three wide column">
+          <h4 class="ui header">Total Capacity
+            <div class="sub header">{{ stats.total_capacity }} satoshis</div>
+          </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui header">Peer Count
+            <div class="sub header">{{ stats.peer_count }} peers</div>
+          </h4>
+		      <div class="ui clearing divider"></div>
+          <h4 class="ui header">Channel Count
+            <div class="sub header">{{ stats.channel_count }} channels</div>
+          </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui header">Bytes Sent
+            <div class="sub header">{{ stats.bytes_sent }} bytes</div>
+          </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui header">Bytes Received
+            <div class="sub header">{{ stats.bytes_received }} bytes</div>
+          </h4>
+        </div>
+        <div class="three wide column">
+          <h4 class="ui header">Local Balance
+            <div class="sub header">{{ stats.total_local_balance }} satoshis</div>
+          </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui header">Remote Balance
+            <div class="sub header">{{ stats.total_remote_balance }} satoshis</div>
+          </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui section header">Outbound Payments
+            <div class="sub header">{{ stats.total_sent }} satoshis</div>
+          </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui header">Inbound Payments
+            <div class="sub header">{{ stats.total_received }} satoshis</div>
+          </h4>
+        </div>
+        <div class="ten wide column">
+          <div id="myDiv"></div>
+          <script>var data = [{
+            values: [{{ stats.total_local_balance }}, {{ stats.total_remote_balance }}],
+            labels: ['Local Balance', 'Remote Balance'],
+            marker: {
+              colors: ['#2185D0', '#DB2828' ],
+            },
+            domain: {column: 0},
+            name: '',
+            type: 'pie',
+          },{
+            values: [{{ stats.total_sent }}, {{ stats.total_received }}],
+            labels: ['Outbound Payments', 'Inbound Payments'],
+            marker: {
+              colors: ['#FBBD08', '#F2711C'],
+            },
+            name: '',
+            domain: {column: 1},
+            type: 'pie',
+          }];
+
+          var layout = {
+            title: 'Channel Liquidity (in satoshis)',
+            grid: {rows: 1, columns: 2},
+            height: 350,
+            //width: 600,
+            showlegend: true,
+          };
+
+          Plotly.newPlot('myDiv', data, layout);</script>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% for peer in peers %}
+  <div class="ui segments" id="{{ peer.pub_key }}@{{ peer.address }}">
+    <h4 class="ui top sub attached header">Peer: {{ peer.pub_key }}@{{ peer.address }}</h4>
+    <div class="ui attached segment">
+      <div class="ui grid">
+        <div class="three wide column">
+          {% set uri = peer.pub_key + "@" + peer.address %}
+          <img src="{{ qrcode(uri, box_size=2.5 ) }}"></img>
+          <div class="ui divided relaxed list">
+            <div class="item">
+              <div class="content">
+                <div class="header">Name</div>
+                <div class="description"><i class="stop icon" style="color: {{ peer.color }}"></i>{{ peer.alias }}</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Channel Count</div>
+                <div class="description">{{ peer.channels|length }} channels</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Outbound Payments</div>
+                <div class="description">{{ peer.sats_sent }} satoshis</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Inbound Payments</div>
+                <div class="description">{{ peer.sats_received }} satoshis</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Bytes Sent</div>
+                <div class="description">{{ peer.bytes_sent }} bytes</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Bytes Received</div>
+                <div class="description">{{ peer.bytes_received }} bytes</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
+                <div class="header">Latency</div>
+                <div class="description">{{ peer.ping_time }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="thirteen wide column">
+          {% if peer.channels|length > 0 %}
+          <div class="ui segments">
+            {% for channel in peer.channels %}
+            <h5 class="ui sub attached header">Channel: {{ channel.chan_id}}</h5>
+            {% if channel.active == True %}
+            <div class="ui green attached segment">
+              <a class="ui green ribbon label">Active</a>
+            {% else %}
+            <div class="ui red attached segment">
+              <a class="ui green ribbon label">Inactive</a>
+            {% endif %}
+              <div class="ui blue progress" id="balance{{ channel.chan_id }}">
+                <div class="bar">
+                  <div class="progress"></div>
+                </div>
+                <div class="label">Capacity: {{ channel.capacity }} satoshis</div>
+              </div>
+              <script>$('#balance{{ channel.chan_id }}').progress({
+                total: {{ channel.capacity }},
+                value: {{ channel.local_balance }},
+              });</script>
+              <div class="ui two column very relaxed grid">
+                <div class="column">
+                  <div class="ui divided relaxed list">
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Local Balance</div>
+                        <div class="description">{{ channel.local_balance }} satoshis</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Inbound Payments</div>
+                        <div class="description">{{ channel.received }} satoshis</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ui compact mini menu">
+                    <a class="item">
+                      <i class="arrow alternate circle right icon"></i>Base Fee
+                      <div class="floating ui blue mini label">{{ channel.local_policy.fee_base_msat }}</div>
+                    </a>
+                    <a class="item">
+                      <i class="icon percent"></i>Fee Rate
+                      <div class="floating ui blue mini label">{{ channel.local_policy.fee_rate }}</div>
+                    </a>
+                    <a class="item">
+                      <i class="icon key"></i>Min HTLC
+                      <div class="floating ui blue mini label">{{ channel.local_policy.min_htlc }}</div>
+                    </a>
+                    <a class="item">
+                      <i class="icon clock outline"></i> Time Lock Delta
+                      <div class="floating ui blue mini label">{{ channel.local_policy.time_lock_delta }}</div>
+                    </a>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="ui divided relaxed list">
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Remote Balance</div>
+                        <div class="description">{{ channel.remote_balance }} satoshis
+                        </div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Outbound Payments</div>
+                        <div class="description">{{ channel.sent }} satoshis
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ui compact mini menu">
+                    <a class="item">
+                      <i class="arrow alternate circle right icon"></i>Base Fee
+                      <div class="floating ui red mini label">{{ channel.remote_policy.fee_base_msat }}</div>
+                    </a>
+                    <a class="item">
+                      <i class="icon percent"></i>Fee Rate
+                      <div class="floating ui red mini label">{{ channel.remote_policy.fee_rate }}</div>
+                    </a>
+                    <a class="item">
+                      <i class="icon key"></i>Min HTLC
+                      <div class="floating ui red mini label">{{ channel.remote_policy.min_htlc }}</div>
+                    </a>
+                    <a class="item">
+                      <i class="icon clock outline"></i>Time Lock Delta
+                      <div class="floating ui red mini label">{{ channel.remote_policy.time_lock_delta }}</div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

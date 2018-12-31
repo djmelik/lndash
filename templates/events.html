@@ -1,0 +1,241 @@
+<!doctype html>
+{% extends "layout.html" %}
+{% block body %}
+<div class="ui container">
+  <div class="ui segments">
+    <h4 class="ui top sub attached header">Overview</h4>
+    <div class="ui attached segment">
+      <div id="myDiv" style="height:500px"></div>
+      <script>var trace1 = {
+        type: 'scatter',
+        mode: 'lines',
+        name: 'Events',
+        line: {
+          color: '#DB2828',
+          width: 2,
+        },
+        x: [{% for item in forwarding_events %}
+          "{{item.date}}",
+          {% endfor %}],
+        y: [{% for item in forwarding_events %}
+          "{{item.events}}",
+          {% endfor %}],
+        };
+
+        var trace2 = {
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Volume',
+          yaxis: 'y2',
+          line: {
+            color: '#2185D0',
+            width: 2,
+          },
+          x: [{% for item in forwarding_events %}
+            "{{item.date}}",
+            {% endfor %}],
+          y: [{% for item in forwarding_events %}
+            "{{item.volume}}",
+            {% endfor %}],
+          };
+
+          var trace3 = {
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Fees',
+            yaxis: 'y3',
+            line: {
+              color: '#fbbd08',
+              width: 2,
+            },
+            x: [{% for item in forwarding_events %}
+              "{{item.date}}",
+              {% endfor %}],
+            y: [{% for item in forwarding_events %}
+              "{{item.fees}}",
+              {% endfor %}],
+            };
+
+          var data = [trace1, trace2, trace3];
+
+          var layout = {
+            separatethousands: false,
+            title: 'Lightning Forwarding Events (Daily Routed Payments)',
+            xaxis: {
+              type: 'date',
+              domain: [0, 0.9],
+            },
+            yaxis: {
+              title: 'Events (count)',
+              titlefont: {color: '#DB2828'},
+              tickfont: {color: '#DB2828'},
+              anchor: 'free',
+              range: [0, {{ events_stats.maximum.events * 2 }}],
+              rangemode: 'tozero',
+            },
+            yaxis2: {
+              title: 'Volume (sats)',
+              titlefont: {color: '#2185D0'},
+              tickfont: {color: '#2185D0'},
+              anchor: 'x',
+              range: [0, {{ volume_stats.maximum.volume * 2 }}],
+              overlaying: 'y',
+              side: 'right',
+            },
+            yaxis3: {
+              title: 'Fees (sats)',
+              titlefont: {color: '#FBBD08'},
+              tickfont: {color: '#FBDD08'},
+              anchor: 'free',
+              range: [0, {{ fees_stats.maximum.fees * 2 }}],
+              overlaying: 'y',
+              side: 'right',
+              position: 0.98,
+            },
+          };
+          Plotly.newPlot('myDiv', data, layout);</script>
+        </div>
+      </div>
+      <div class="ui segments">
+        <h4 class="ui top sub attached header">Statistics</h4>
+        <div class="ui attached segment">
+          <div class="ui three column grid">
+            <div class="column">
+              <div class="ui segments">
+                <h4 class="ui top sub attached header">Events</h4>
+                <div class="ui attached segment">
+                  <h4 class="ui header">
+                    <div class="sub header">Events refers to the number of routed lightning payments.</div>
+                  </h4>
+                  <div class="ui divided relaxed list">
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Maximum</div>
+                        <div class="description">{{ events_stats.maximum.events }} payments routed on {{ events_stats.maximum.date }}.</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Minimum</div>
+                        <div class="description">{{ events_stats.minimum.events }} payments routed on {{ events_stats.minimum.date }}.</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Average</div>
+                        <div class="description">{{ events_stats.average }} payments per day</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Total</div>
+                        <div class="description">{{ events_stats.total }} payments</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="ui segments">
+                <h4 class="ui top sub attached header">Volume</h4>
+                <div class="ui attached segment">
+                  <h4 class="ui header">
+                    <div class="sub header">Volume refers to the total transaction volume (in sats).</div>
+                  </h4>
+                  <div class="ui divided relaxed list">
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Maximum</div>
+                        <div class="description">{{ volume_stats.maximum.volume }} satoshis routed on {{ volume_stats.maximum.date }}.</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Minimum</div>
+                        <div class="description">{{ volume_stats.minimum.volume }} satoshis routed on {{ volume_stats.minimum.date }}.</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Average</div>
+                        <div class="description">{{ volume_stats.average }} satoshis per day</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Total</div>
+                        <div class="description">{{ volume_stats.total }} satoshis</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="ui segments">
+                <h4 class="ui top sub attached header">Fees</h4>
+                <div class="ui attached segment">
+                  <h4 class="ui header">
+                    <div class="sub header">Fees refers to the total number of fees collected (in sats).</div>
+                  </h4>
+                  <div class="ui divided relaxed list">
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Maximum</div>
+                        <div class="description">{{ fees_stats.maximum.fees }} fees collected on {{ fees_stats.maximum.date }}.</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Minimum</div>
+                        <div class="description">{{ fees_stats.minimum.fees }} fees collected on {{ fees_stats.minimum.date }}.</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Average</div>
+                        <div class="description">{{ fees_stats.average }} fees collected per day</div>
+                      </div>
+                    </div>
+                    <div class="item">
+                      <div class="content">
+                        <div class="header">Total</div>
+                        <div class="description">{{ fees_stats.total }} fees collected</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ui segments">
+        <h4 class="ui top sub attached header">Daily Fee Table</h4>
+        <div class="ui attached segment">
+          <table class="ui single line table small">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Events (payments)</th>
+                <th>Volume (sats)</th>
+                <th>Fees (sats)</th>
+              </tr>
+            </head>
+            <tbody>
+              {% for item in forwarding_events|reverse %}
+              <tr>
+                <td>{{ item.date }}</td>
+                <td>{{ item.events }}</td>
+                <td>{{ item.volume }}</td>
+                <td>{{ item.fees }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
