@@ -2,8 +2,9 @@ import time, datetime
 import libs.rpc_pb2 as ln
 import libs.rpc_pb2_grpc as lnrpc
 import os, grpc, codecs
+import random
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, json
 from flask_caching import Cache
 from flask_qrcode import QRcode
 from protobuf_to_dict import protobuf_to_dict
@@ -259,6 +260,30 @@ def events():
     }
 
     return render_template('events.html', **content)
+
+@app.route("/map")
+@cache.cached(timeout=600)
+def lightning_map():
+    return render_template('map.html')
+
+@app.route("/map_data")
+@cache.cached(timeout=1800)
+def map_data():
+    response = stub.DescribeGraph(ln.ChannelGraphRequest())
+    nodes = map(lambda x: { 'id': x.pub_key, 'alias': x.alias, 'color': x.color }, response.nodes)
+    links = map(lambda x: { 'id': x.channel_id, 'source': x.node1_pub, 'target': x.node2_pub, 'value': x.capacity }, response.edges)
+    
+    map_data = {
+        'nodes': nodes,
+        'links': links,
+    }
+
+    content = app.response_class(
+        response=json.dumps(map_data),
+        status=200,
+        mimetype='application/json'
+    )
+    return content
 
 if __name__ == '__main__':
     app.run()
