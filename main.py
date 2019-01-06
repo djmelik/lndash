@@ -2,25 +2,23 @@ import time, datetime
 import libs.rpc_pb2 as ln
 import libs.rpc_pb2_grpc as lnrpc
 import os, grpc, codecs
-import random
 
 from flask import Flask, render_template, request, json
 from flask_caching import Cache
 from flask_qrcode import QRcode
 from protobuf_to_dict import protobuf_to_dict
-from collections import Counter
 
 app = Flask(__name__)
-app.debug = True
+app.debug = False
 app.testing = False
 qrcode = QRcode(app)
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app)
 
 # LND gRPC Variables
-macaroon_path='config/readonly.macaroon'
-cert_path='config/tls.cert'
-lnd_grpc_server='10.1.0.100:10009'
+macaroon_path = 'config/readonly.macaroon'
+cert_path = 'config/tls.cert'
+lnd_grpc_server = '127.0.0.1:10009'
 os.environ["GRPC_SSL_CIPHER_SUITES"] = 'HIGH+ECDSA'
 macaroon = codecs.encode(open(macaroon_path, 'rb').read(), 'hex')
 cert = open(cert_path, 'rb').read()
@@ -74,7 +72,6 @@ def query():
     return render_template('query.html', **content)
 
 @app.route("/")
-@cache.cached(timeout=60)
 def home():
     node_info = protobuf_to_dict(stub.GetInfo(ln.GetInfoRequest()))
     node_info_detail = stub.GetNodeInfo(ln.NodeInfoRequest(pub_key=node_info['identity_pubkey']))
@@ -85,7 +82,6 @@ def home():
     return render_template('index.html', **content)
 
 @app.route("/channels")
-@cache.cached(timeout=60)
 def channels():
     peers = []
     total_capacity = 0
@@ -194,21 +190,36 @@ def channels():
     return render_template('channels.html', **content)
 
 @app.route('/events')
-@cache.cached(timeout=60)
 def events():
-    request = ln.ForwardingHistoryRequest(
-        start_time = 0,
-        end_time = int(time.time()),
-        index_offset = 0,
-        num_max_events = 100000,
-    )
-    response = stub.ForwardingHistory(request)
-
     events = []
-    for i in response.forwarding_events:
-        tx_date = datetime.datetime.fromtimestamp(i.timestamp).strftime('%y-%m-%d')
-        tx_size = i.amt_out
-        tx_fee = i.fee
+    max_events = 0
+    min_events = 0
+    avg_events = 0
+    total_events = 0
+
+    max_volume = 0
+    min_volume = 0
+    avg_volume = 0
+    total_volume = 0
+
+    max_fees = 0
+    min_fees = 0
+    avg_fees = 0
+    total_fees = 0
+
+    events_response = stub.ForwardingHistory(
+        ln.ForwardingHistoryRequest(
+            start_time = 0,
+            end_time = int(time.time()),
+            index_offset = 0,
+            num_max_events = 100000,
+        )
+    )
+
+    for event in events_response.forwarding_events:
+        tx_date = datetime.datetime.fromtimestamp(event.timestamp).strftime('%y-%m-%d')
+        tx_size = event.amt_out
+        tx_fee = event.fee
 
         events_filter = filter(lambda x: x['date'] == tx_date, events)
         if len(events_filter) > 0:
@@ -219,23 +230,24 @@ def events():
         else:
             events.append({ 'date': tx_date, 'events': 1, 'volume': tx_size, 'fees': tx_fee})
 
-    max_events = max(events, key=lambda x: x['events'])
-    min_events = min(events, key=lambda x: x['events'])
-    events_list = map(lambda x: x['events'], events)
-    avg_events = round(sum(events_list) / (float(len(events_list))), 2)
-    total_events = sum(events_list)
+    if len(events) > 0:
+        max_events = max(events, key=lambda x: x['events'])
+        min_events = min(events, key=lambda x: x['events'])
+        events_list = map(lambda x: x['events'], events)
+        avg_events = round(sum(events_list) / (float(len(events_list))), 2)
+        total_events = sum(events_list)
 
-    max_volume = max(events, key=lambda x: x['volume'])
-    min_volume = min(events, key=lambda x: x['volume'])
-    volume_list = map(lambda x: x['volume'], events)
-    avg_volume = round(sum(volume_list) / (float(len(volume_list))), 2)
-    total_volume = sum(volume_list)
+        max_volume = max(events, key=lambda x: x['volume'])
+        min_volume = min(events, key=lambda x: x['volume'])
+        volume_list = map(lambda x: x['volume'], events)
+        avg_volume = round(sum(volume_list) / (float(len(volume_list))), 2)
+        total_volume = sum(volume_list)
 
-    max_fees = max(events, key=lambda x: x['fees'])
-    min_fees = min(events, key=lambda x: x['fees'])
-    fees_list = map(lambda x: x['fees'], events)
-    avg_fees = round(sum(fees_list) / (float(len(fees_list))), 2)
-    total_fees = sum(fees_list)
+        max_fees = max(events, key=lambda x: x['fees'])
+        min_fees = min(events, key=lambda x: x['fees'])
+        fees_list = map(lambda x: x['fees'], events)
+        avg_fees = round(sum(fees_list) / (float(len(fees_list))), 2)
+        total_fees = sum(fees_list)
 
     content = {
         'forwarding_events': events,
@@ -244,19 +256,19 @@ def events():
             'minimum': min_events,
             'average': avg_events,
             'total': total_events,
-            },
+        },
         'volume_stats': {
             'maximum': max_volume,
             'minimum': min_volume,
             'average': avg_volume,
             'total': total_volume,
-            },
+        },
         'fees_stats': {
             'maximum': max_fees,
             'minimum': min_fees,
             'average': avg_fees,
             'total': total_fees,
-            },
+        },
     }
 
     return render_template('events.html', **content)
@@ -272,7 +284,7 @@ def map_data():
     response = stub.DescribeGraph(ln.ChannelGraphRequest())
     nodes = map(lambda x: { 'id': x.pub_key, 'alias': x.alias, 'color': x.color }, response.nodes)
     links = map(lambda x: { 'id': x.channel_id, 'source': x.node1_pub, 'target': x.node2_pub, 'value': x.capacity }, response.edges)
-    
+
     map_data = {
         'nodes': nodes,
         'links': links,
@@ -284,6 +296,27 @@ def map_data():
         mimetype='application/json'
     )
     return content
+
+@app.template_filter()
+def format_thousands_int(amount):
+    return "{0:,d}".format(long(amount))
+
+@app.template_filter()
+def format_thousands_float(amount):
+    return "{0:,.2f}".format(amount)
+
+@app.template_filter()
+def convert_bytes(n):
+    suffix = {
+      'TB': 1000 ** 4,
+      'GB': 1000 ** 3,
+      'MB': 1000 ** 2,
+      'KB': 1000,
+    }
+    for k, v in sorted(suffix.items(), key=lambda x: x[1], reverse=True):
+      if n / v >= 1:
+        return '%.2f %s' % (float(n) / v, k)
+    return '%.2f %s' % (n, 'B')
 
 if __name__ == '__main__':
     app.run()

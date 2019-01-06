@@ -8,40 +8,40 @@
       <div class="ui grid">
         <div class="three wide column">
           <h4 class="ui header">Total Capacity
-            <div class="sub header">{{ stats.total_capacity }} satoshis</div>
+            <div class="sub header">{{ stats.total_capacity|format_thousands_int }} satoshis</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui header">Peer Count
-            <div class="sub header">{{ stats.peer_count }} peers</div>
+            <div class="sub header">{{ stats.peer_count|format_thousands_int }} peers</div>
           </h4>
 		      <div class="ui clearing divider"></div>
           <h4 class="ui header">Channel Count
-            <div class="sub header">{{ stats.channel_count }} channels</div>
+            <div class="sub header">{{ stats.channel_count|format_thousands_int }} channels</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui header">Bytes Sent
-            <div class="sub header">{{ stats.bytes_sent }} bytes</div>
+            <div class="sub header">{{ stats.bytes_sent|convert_bytes }}</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui header">Bytes Received
-            <div class="sub header">{{ stats.bytes_received }} bytes</div>
+            <div class="sub header">{{ stats.bytes_received|convert_bytes }}</div>
           </h4>
         </div>
         <div class="three wide column">
           <h4 class="ui header">Local Balance
-            <div class="sub header">{{ stats.total_local_balance }} satoshis</div>
+            <div class="sub header">{{ stats.total_local_balance|format_thousands_int }} satoshis</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui header">Remote Balance
-            <div class="sub header">{{ stats.total_remote_balance }} satoshis</div>
+            <div class="sub header">{{ stats.total_remote_balance|format_thousands_int }} satoshis</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui section header">Outbound Payments
-            <div class="sub header">{{ stats.total_sent }} satoshis</div>
+            <div class="sub header">{{ stats.total_sent|format_thousands_int }} satoshis</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui header">Inbound Payments
-            <div class="sub header">{{ stats.total_received }} satoshis</div>
+            <div class="sub header">{{ stats.total_received|format_thousands_int }} satoshis</div>
           </h4>
         </div>
         <div class="ten wide column">
@@ -103,31 +103,31 @@
             <div class="item">
               <div class="content">
                 <div class="header">Outbound Payments</div>
-                <div class="description">{{ peer.sats_sent }} satoshis</div>
+                <div class="description">{{ peer.sats_sent|format_thousands_int }} satoshis</div>
               </div>
             </div>
             <div class="item">
               <div class="content">
                 <div class="header">Inbound Payments</div>
-                <div class="description">{{ peer.sats_received }} satoshis</div>
+                <div class="description">{{ peer.sats_received|format_thousands_int }} satoshis</div>
               </div>
             </div>
             <div class="item">
               <div class="content">
                 <div class="header">Bytes Sent</div>
-                <div class="description">{{ peer.bytes_sent }} bytes</div>
+                <div class="description">{{ peer.bytes_sent|convert_bytes }}</div>
               </div>
             </div>
             <div class="item">
               <div class="content">
                 <div class="header">Bytes Received</div>
-                <div class="description">{{ peer.bytes_received }} bytes</div>
+                <div class="description">{{ peer.bytes_received|convert_bytes }}</div>
               </div>
             </div>
             <div class="item">
               <div class="content">
                 <div class="header">Latency</div>
-                <div class="description">{{ peer.ping_time }}</div>
+                <div class="description">{{ peer.ping_time|format_thousands_int }}</div>
               </div>
             </div>
           </div>
@@ -148,7 +148,7 @@
                 <div class="bar">
                   <div class="progress"></div>
                 </div>
-                <div class="label">Capacity: {{ channel.capacity }} satoshis</div>
+                <div class="label">Capacity: {{ channel.capacity|format_thousands_int }} satoshis</div>
               </div>
               <script>$('#balance{{ channel.chan_id }}').progress({
                 total: {{ channel.capacity }},
@@ -160,13 +160,13 @@
                     <div class="item">
                       <div class="content">
                         <div class="header">Local Balance</div>
-                        <div class="description">{{ channel.local_balance }} satoshis</div>
+                        <div class="description">{{ channel.local_balance|format_thousands_int }} satoshis</div>
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Inbound Payments</div>
-                        <div class="description">{{ channel.received }} satoshis</div>
+                        <div class="description">{{ channel.received|format_thousands_int }} satoshis</div>
                       </div>
                     </div>
                   </div>
@@ -194,14 +194,14 @@
                     <div class="item">
                       <div class="content">
                         <div class="header">Remote Balance</div>
-                        <div class="description">{{ channel.remote_balance }} satoshis
+                        <div class="description">{{ channel.remote_balance|format_thousands_int }} satoshis
                         </div>
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Outbound Payments</div>
-                        <div class="description">{{ channel.sent }} satoshis
+                        <div class="description">{{ channel.sent|format_thousands_int }} satoshis
                         </div>
                       </div>
                     </div>

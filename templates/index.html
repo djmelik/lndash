@@ -29,15 +29,15 @@
         </div>
         <div class="three wide column">
           <h4 class="ui header">Total Capacity
-            <div class="sub header">{{ total_capacity }} satoshis</div>
+            <div class="sub header">{{ total_capacity|format_thousands_int }} satoshis</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui header">Peer Count
-            <div class="sub header">{{ num_peers }} peers</div>
+            <div class="sub header">{{ num_peers|format_thousands_int }} pesers</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui section header">Channel Count
-            <div class="sub header">{{ num_active_channels }}</div>
+            <div class="sub header">{{ num_active_channels|format_thousands_int }}</div>
           </h4>
           <div class="ui clearing divider"></div>
         </div>

@@ -45,7 +45,7 @@
             name: 'Fees',
             yaxis: 'y3',
             line: {
-              color: '#fbbd08',
+              color: '#FBBD08',
               width: 2,
             },
             x: [{% for item in forwarding_events %}
@@ -85,7 +85,7 @@
             yaxis3: {
               title: 'Fees (sats)',
               titlefont: {color: '#FBBD08'},
-              tickfont: {color: '#FBDD08'},
+              tickfont: {color: '#FBBD08'},
               anchor: 'free',
               range: [0, {{ fees_stats.maximum.fees * 2 }}],
               overlaying: 'y',
@@ -111,25 +111,33 @@
                     <div class="item">
                       <div class="content">
                         <div class="header">Maximum</div>
-                        <div class="description">{{ events_stats.maximum.events }} payments routed on {{ events_stats.maximum.date }}.</div>
+                        {% if forwarding_events|length > 0 %}
+                        <div class="description">{{ events_stats.maximum.events|format_thousands_int }} payments routed on {{ events_stats.maximum.date }}</div>
+                        {% else %}
+                        <div class="description">{{ events_stats.maximum }} payments</div>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Minimum</div>
-                        <div class="description">{{ events_stats.minimum.events }} payments routed on {{ events_stats.minimum.date }}.</div>
+                        {% if forwarding_events|length > 0 %}
+                        <div class="description">{{ events_stats.minimum.events|format_thousands_int }} payments routed on {{ events_stats.minimum.date }}</div>
+                        {% else %}
+                        <div class="description">{{ events_stats.minimum }} payments</div>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Average</div>
-                        <div class="description">{{ events_stats.average }} payments per day</div>
+                        <div class="description">{{ events_stats.average|format_thousands_float }} payments per day</div>
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Total</div>
-                        <div class="description">{{ events_stats.total }} payments</div>
+                        <div class="description">{{ events_stats.total|format_thousands_int }} payments</div>
                       </div>
                     </div>
                   </div>
@@ -147,25 +155,33 @@
                     <div class="item">
                       <div class="content">
                         <div class="header">Maximum</div>
-                        <div class="description">{{ volume_stats.maximum.volume }} satoshis routed on {{ volume_stats.maximum.date }}.</div>
+                        {% if forwarding_events|length > 0 %}
+                        <div class="description">{{ volume_stats.maximum.volume|format_thousands_int }} satoshis routed on {{ volume_stats.maximum.date }}</div>
+                        {% else %}
+                        <div class="description">{{ volume_stats.maximum }} satoshis</div>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Minimum</div>
-                        <div class="description">{{ volume_stats.minimum.volume }} satoshis routed on {{ volume_stats.minimum.date }}.</div>
+                        {% if forwarding_events|length > 0 %}
+                        <div class="description">{{ volume_stats.minimum.volume|format_thousands_int }} satoshis routed on {{ volume_stats.minimum.date }}</div>
+                        {% else %}
+                        <div class="description">{{ volume_stats.minimum }} satoshis</div>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Average</div>
-                        <div class="description">{{ volume_stats.average }} satoshis per day</div>
+                        <div class="description">{{ volume_stats.average|format_thousands_float }} satoshis per day</div>
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Total</div>
-                        <div class="description">{{ volume_stats.total }} satoshis</div>
+                        <div class="description">{{ volume_stats.total|format_thousands_int }} satoshis</div>
                       </div>
                     </div>
                   </div>
@@ -183,25 +199,33 @@
                     <div class="item">
                       <div class="content">
                         <div class="header">Maximum</div>
-                        <div class="description">{{ fees_stats.maximum.fees }} fees collected on {{ fees_stats.maximum.date }}.</div>
+                        {% if forwarding_events|length > 0 %}
+                        <div class="description">{{ fees_stats.maximum.fees|format_thousands_int }} fees collected on {{ fees_stats.maximum.date }}</div>
+                        {% else %}
+                        <div class="description">{{ fees_stats.maximum }} satoshis</div>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Minimum</div>
-                        <div class="description">{{ fees_stats.minimum.fees }} fees collected on {{ fees_stats.minimum.date }}.</div>
+                        {% if forwarding_events|length > 0 %}
+                        <div class="description">{{ fees_stats.minimum.fees|format_thousands_int }} fees collected on {{ fees_stats.minimum.date }}</div>
+                        {% else %}
+                        <div class="description">{{ fees_stats.minimum }} satoshis</div>
+                        {% endif %}
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Average</div>
-                        <div class="description">{{ fees_stats.average }} fees collected per day</div>
+                        <div class="description">{{ fees_stats.average|format_thousands_float }} fees collected per day</div>
                       </div>
                     </div>
                     <div class="item">
                       <div class="content">
                         <div class="header">Total</div>
-                        <div class="description">{{ fees_stats.total }} fees collected</div>
+                        <div class="description">{{ fees_stats.total|format_thousands_int }} fees collected</div>
                       </div>
                     </div>
                   </div>
@@ -220,6 +244,7 @@
                 <th>Date</th>
                 <th>Events (payments)</th>
                 <th>Volume (sats)</th>
+                <th>Average Event Size (sats)</th>
                 <th>Fees (sats)</th>
               </tr>
             </head>
@@ -228,8 +253,9 @@
               <tr>
                 <td>{{ item.date }}</td>
                 <td>{{ item.events }}</td>
-                <td>{{ item.volume }}</td>
-                <td>{{ item.fees }}</td>
+                <td>{{ item.volume|format_thousands_int }}</td>
+                <td>{{ (item.volume / item.events)|format_thousands_float }}</td>
+                <td>{{ item.fees|format_thousands_int }}</td>
               </tr>
               {% endfor %}
             </tbody>
