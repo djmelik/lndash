@@ -202,7 +202,7 @@
                         {% if forwarding_events|length > 0 %}
                         <div class="description">{{ fees_stats.maximum.fees|format_thousands_int }} fees collected on {{ fees_stats.maximum.date }}</div>
                         {% else %}
-                        <div class="description">{{ fees_stats.maximum }} satoshis</div>
+                        <div class="description">{{ fees_stats.maximum }} fees</div>
                         {% endif %}
                       </div>
                     </div>
@@ -212,7 +212,7 @@
                         {% if forwarding_events|length > 0 %}
                         <div class="description">{{ fees_stats.minimum.fees|format_thousands_int }} fees collected on {{ fees_stats.minimum.date }}</div>
                         {% else %}
-                        <div class="description">{{ fees_stats.minimum }} satoshis</div>
+                        <div class="description">{{ fees_stats.minimum }} fees</div>
                         {% endif %}
                       </div>
                     </div>
