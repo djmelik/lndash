@@ -5,13 +5,10 @@ import os, grpc, codecs
 
 from flask import Flask, render_template, request, json
 from flask_caching import Cache
-from flask_qrcode import QRcode
-from protobuf_to_dict import protobuf_to_dict
 
 app = Flask(__name__)
 app.debug = False
 app.testing = False
-qrcode = QRcode(app)
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app)
 
@@ -38,18 +35,7 @@ combined_creds = grpc.composite_channel_credentials(cert_creds, auth_creds)
 channel = grpc.secure_channel(lnd_grpc_server, combined_creds, options=grpc_options)
 stub = lnrpc.LightningStub(channel)
 
-@app.route('/qrcode', methods=['GET'])
-@cache.cached(timeout=300)
-def get_qrcode():
-    data = request.args.get('data', '')
-
-    return send_file(
-    qrcode(data, mode='raw'),
-    mimetype='image/png'
-    )
-
 @app.route("/query", methods=['GET', 'POST'])
-#@cache.cached(timeout=60)
 def query():
     nodes = stub.DescribeGraph(ln.ChannelGraphRequest()).nodes
 
@@ -72,16 +58,31 @@ def query():
     return render_template('query.html', **content)
 
 @app.route("/")
+@cache.cached(timeout=60)
 def home():
-    node_info = protobuf_to_dict(stub.GetInfo(ln.GetInfoRequest()))
-    node_info_detail = stub.GetNodeInfo(ln.NodeInfoRequest(pub_key=node_info['identity_pubkey']))
+    node_info = stub.GetInfo(ln.GetInfoRequest())
+    node_info_detail = stub.GetNodeInfo(ln.NodeInfoRequest(pub_key=node_info.identity_pubkey))
 
-    content = node_info
-    content.update({'total_capacity': node_info_detail.total_capacity})
+    content = {
+        'identity_pubkey': node_info.identity_pubkey,
+        'uris': node_info.uris,
+        'alias': node_info.alias,
+        'chains': node_info.chains,
+        'version': node_info.version,
+        'block_height': node_info.block_height,
+        'synced': str(node_info.synced_to_chain),
+        'block_hash': node_info.block_hash,
+        'num_active_channels': node_info.num_active_channels,
+        'num_inactive_channels': node_info.num_inactive_channels,
+        'num_pending_channels': node_info.num_pending_channels,
+        'num_peers': node_info.num_peers,
+        'total_capacity': node_info_detail.total_capacity
+    }
 
     return render_template('index.html', **content)
 
 @app.route("/channels")
+@cache.cached(timeout=60)
 def channels():
     peers = []
     total_capacity = 0
@@ -190,6 +191,7 @@ def channels():
     return render_template('channels.html', **content)
 
 @app.route('/events')
+@cache.cached(timeout=60)
 def events():
     events = []
     max_events = 0

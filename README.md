@@ -52,7 +52,7 @@ pip install -r requirements.txt
 
 ```
 cp ~/.lnd/tls.cert config/tls.cert
-cp ~/.lnd/readonly.macaroon config/readonly.macaroon
+cp ~/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon config/readonly.macaroon
 ```
 
 8. (Optional) If lnd is installed on a remote host, edit `main.py` and update lnd's server IP.

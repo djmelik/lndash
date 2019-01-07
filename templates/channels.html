@@ -86,7 +86,14 @@
       <div class="ui grid">
         <div class="three wide column">
           {% set uri = peer.pub_key + "@" + peer.address %}
-          <img src="{{ qrcode(uri, box_size=2.5 ) }}"></img>
+          <div id="qrcode-{{ uri }}"></div>
+          <script type="text/javascript">
+            new QRCode(document.getElementById("qrcode-{{ uri }}"), {
+              text: "{{ uri }}",
+              width: 128,
+              height: 128,
+            });
+          </script>
           <div class="ui divided relaxed list">
             <div class="item">
               <div class="content">

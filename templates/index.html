@@ -3,7 +3,11 @@
 {% block body %}
 <div class="ui container">
   <div class="ui segments">
+    {% if uris|length > 0 %}
     <h4 class="ui top sub attached header">Node: {{ uris[0] }}</h4>
+    {% else %}
+    <h4 class="ui top sub attached header">Node: {{ identity_pubkey }}</h4>
+    {% endif %}
     <div class="ui attached segment">
       <div class="ui grid">
         <div class="three wide column">
@@ -19,8 +23,8 @@
             <div class="sub header"><a href="https://www.smartbit.com.au/block/{{ block_height }}">{{ block_height }}</a></div>
           </h4>
           <div class="ui clearing divider"></div>
-          <h4 class="ui header">Block Hash
-            <div class="sub header"><a href="https://www.smartbit.com.au/block/{{ block_hash }}">{{ block_hash }}</a></div>
+          <h4 class="ui header wrap">Synchronized
+            <div class="sub header">{{ synced }}</div>
           </h4>
           <div class="ui clearing divider"></div>
           <h4 class="ui header">LND Version
@@ -36,15 +40,29 @@
             <div class="sub header">{{ num_peers|format_thousands_int }} peers</div>
           </h4>
           <div class="ui clearing divider"></div>
-          <h4 class="ui section header">Channel Count
+          <h4 class="ui section header">Active Channel Count
             <div class="sub header">{{ num_active_channels|format_thousands_int }}</div>
           </h4>
           <div class="ui clearing divider"></div>
+          <h4 class="ui section header">Pending Channel Count
+            <div class="sub header">{{ num_pending_channels|format_thousands_int }}</div>
+          </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui section header">Inactive Channel Count
+            <div class="sub header">{{ num_inactive_channels|format_thousands_int }}</div>
+          </h4>
         </div>
-        <div class="five wide column"></div>
-        <div class="five wide right aligned column">
+        <div class="six wide column"></div>
+        <div class="four wide right aligned column">
           <h1 class="ui header">Connect</h4>
-          <img src="{{ qrcode(uris[0], box_size=8) }}"></img>
+          <div id="qrcode"></div>
+          <script type="text/javascript">
+            {% if uris|length > 0 %}
+            new QRCode(document.getElementById("qrcode"), "{{ uris[0]}}");
+            {% else %}
+            new QRCode(document.getElementById("qrcode"), "{{ identity_pubkey }}");
+            {% endif %}
+          </script>
         </div>
       </div>
     </div>
