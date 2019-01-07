@@ -4,7 +4,7 @@
 <div class="ui container">
   <div class="ui segments">
     <h4 class="ui top sub attached header">Overview</h4>
-    {% if events|length == 0 %}
+    {% if forwarding_events|length == 0 %}
     <div class="ui attached segment">This lightning node has not routed any payments yet. Please check back later.</div>
     {% else %}
     <div class="ui attached segment">
