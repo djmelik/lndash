@@ -68,3 +68,25 @@ gunicorn main:app
 ```
 
 10. (Optional) You can set up an nginx reverse proxy and publicly expose your lndash instance. *Note: need to write these instructions.*
+
+## Docker
+### Building the docker container
+`cd` into the `lndash` directory and run the following command:
+
+```
+docker build -t lndash:latest .
+```
+This will build the docker container and give it the tag `lndash`.
+
+### Running the docker container
+Three things need to be configured to run the `lndash` docker container.
+
+1. The path to the TLS certificate and readonly macaroon.
+2. The port on which the web app should listen.
+3. The LND server's RPC address
+
+These can all be configured via the docker command line, as follows:
+```
+docker run -d --restart -v=/home/ubuntu/lndashcredentials:/usr/src/app/config -p 80:8000 -e LNDASH_LND_SERVER='192.168.1.2:10009' lndash:latest
+```
+The above command line assumes tls.cert and readonly.macaroon have been copied to the directory `/home/ubuntu/lndashcredentials`, and that the LND server is available on port 10009 at IP address 192.168.1.2. It makes the `lndash` server available on port 80.

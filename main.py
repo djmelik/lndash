@@ -18,7 +18,7 @@ cache.init_app(app)
 # LND gRPC Variables
 macaroon_path = 'config/readonly.macaroon'
 cert_path = 'config/tls.cert'
-lnd_grpc_server = '127.0.0.1:10009'
+lnd_grpc_server = os.getenv("LNDASH_LND_SERVER", '127.0.0.1:10009')
 os.environ["GRPC_SSL_CIPHER_SUITES"] = 'HIGH+ECDSA'
 macaroon = codecs.encode(open(macaroon_path, 'rb').read(), 'hex')
 cert = open(cert_path, 'rb').read()
