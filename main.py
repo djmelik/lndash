@@ -126,7 +126,7 @@ def channels():
         peer_filter = filter(lambda x: x['pub_key'] == channel.remote_pubkey, peers)
         index = peers.index(peer_filter[0])
 
-         try:
+        try:
             chan_info = stub.GetChanInfo(ln.ChanInfoRequest(chan_id=channel.chan_id))
         except grpc.RpcError as e:
             e.details()
