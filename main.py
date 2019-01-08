@@ -2,11 +2,14 @@ import time, datetime
 import libs.rpc_pb2 as ln
 import libs.rpc_pb2_grpc as lnrpc
 import os, grpc, codecs
+import filters
 
 from flask import Flask, render_template, request, json
 from flask_caching import Cache
 
 app = Flask(__name__)
+app.register_blueprint(filters.blueprint)
+
 app.debug = False
 app.testing = False
 cache = Cache(config={'CACHE_TYPE': 'simple'})
@@ -162,6 +165,7 @@ def channels():
             'active': channel.active,
             'chan_id': channel.chan_id,
             'capacity': channel.capacity,
+            'commit_fee': channel.commit_fee,
             'local_balance': channel.local_balance,
             'remote_balance': channel.remote_balance,
             'sent': channel.total_satoshis_sent,
@@ -301,27 +305,6 @@ def map_data():
         mimetype='application/json'
     )
     return content
-
-@app.template_filter()
-def format_thousands_int(amount):
-    return "{0:,d}".format(long(amount))
-
-@app.template_filter()
-def format_thousands_float(amount):
-    return "{0:,.2f}".format(amount)
-
-@app.template_filter()
-def convert_bytes(n):
-    suffix = {
-      'TB': 1000 ** 4,
-      'GB': 1000 ** 3,
-      'MB': 1000 ** 2,
-      'KB': 1000,
-    }
-    for k, v in sorted(suffix.items(), key=lambda x: x[1], reverse=True):
-      if n / v >= 1:
-        return '%.2f %s' % (float(n) / v, k)
-    return '%.2f %s' % (n, 'B')
 
 if __name__ == '__main__':
     app.run()
