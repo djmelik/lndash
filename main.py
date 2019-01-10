@@ -99,6 +99,7 @@ def channels():
     total_remote_balance = 0
     total_sent = 0
     total_received = 0
+    total_commit = 0
     bytes_sent = 0
     bytes_received = 0
     channel_count = 0
@@ -191,6 +192,7 @@ def channels():
         total_remote_balance += channel.remote_balance
         total_sent += channel.total_satoshis_sent
         total_received += channel.total_satoshis_received
+        total_commit += channel.commit_fee
 
     content = {
         "peers": sorted(peers, key=lambda x: x["alias"].lower()),
@@ -200,6 +202,7 @@ def channels():
             "total_remote_balance": total_remote_balance,
             "total_sent": total_sent,
             "total_received": total_received,
+            "total_commit": total_commit,
             "bytes_sent": bytes_sent,
             "bytes_received": bytes_received,
             "channel_count": len(channels_response.channels),

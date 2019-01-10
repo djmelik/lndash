@@ -43,14 +43,18 @@
           <h4 class="ui header">Inbound Payments
             <div class="sub header">{{ stats.total_received|format_thousands_int }} satoshis</div>
           </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui header">Commit Fees
+            <div class="sub header">{{ stats.total_commit|format_thousands_int }} satoshis</div>
+          </h4>
         </div>
         <div class="ten wide column">
           <div id="myDiv"></div>
           <script>var data = [{
-            values: [{{ stats.total_local_balance }}, {{ stats.total_remote_balance }}],
-            labels: ['Local Balance', 'Remote Balance'],
+            values: [{{ stats.total_local_balance }}, {{ stats.total_remote_balance }}, {{ stats.total_commit }}],
+            labels: ['Local Balance', 'Remote Balance', 'Commit Fees'],
             marker: {
-              colors: ['#2185D0', '#DB2828' ],
+              colors: ['#2185D0', '#DB2828', '#21BA45'],
             },
             domain: {column: 0},
             name: '',
