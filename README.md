@@ -5,17 +5,17 @@ lndash is a simple read-only web dashboard for lnd.
 ## Features
 * Peer view
 * Channel view
-* Events (routed payments) view
+* Forwarding Events (routed payments) view
 * Looking Glass Tool (route/path lookup)
 * Lightning Network Graph
 
 ## Installation
-*Please note that the following installation instructions are still a work in progress. This guide was written on a Debian system*
+*Please note that the following installation instructions are still a work in progress. This guide was written on a Debian system.*
 
 1. Install dependencies.
 
 ```
-apt-get install python-pip python-virtualenv
+apt-get install python3-pip python3-virtualenv virtualenv
 ```
 
 2. Clone lndash repository.
@@ -33,7 +33,7 @@ cd lndash
 4. Set up python virtualenv.
 
 ```
-virtualenv venv
+virtualenv -p python3 venv
 ```
 
 5. Activate virtual environment.
