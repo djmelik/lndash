@@ -18,7 +18,7 @@ cache.init_app(app)
 # LND gRPC Variables
 macaroon_path = "config/readonly.macaroon"
 cert_path = "config/tls.cert"
-lnd_grpc_server = "127.0.0.1:10009"
+lnd_grpc_server = "localhost:10009"
 os.environ["GRPC_SSL_CIPHER_SUITES"] = "HIGH+ECDSA"
 macaroon = codecs.encode(open(macaroon_path, "rb").read(), "hex")
 cert = open(cert_path, "rb").read()
@@ -103,6 +103,18 @@ def channels():
     bytes_sent = 0
     bytes_received = 0
     channel_count = 0
+    scatterPlot = {
+        "ids": [],
+        "x": [],
+        "y": [],
+        "mode": 'markers',
+        "type": 'scatter',
+        "hovertext": [],
+        "marker": {
+            "size": 12,
+            "color": [],
+        }
+    }
 
     peers_response = stub.ListPeers(ln.ListPeersRequest())
     channels_response = stub.ListChannels(ln.ListChannelsRequest(active_only=True))
@@ -139,6 +151,12 @@ def channels():
     for channel in channels_response.channels:
         peer_filter = [x for x in peers if x["pub_key"] == channel.remote_pubkey]
         index = peers.index(peer_filter[0])
+
+        scatterPlot["ids"].append(channel.chan_id)
+        scatterPlot["y"].append(int(channel.capacity))
+        scatterPlot["x"].append(100.0 * channel.local_balance / channel.capacity)
+        scatterPlot["hovertext"].append(peers[index]["alias"])
+        scatterPlot["marker"]["color"].append(str(peers[index]["color"]))
 
         try:
             chan_info = stub.GetChanInfo(ln.ChanInfoRequest(chan_id=channel.chan_id))
@@ -208,9 +226,9 @@ def channels():
             "channel_count": len(channels_response.channels),
             "peer_count": len(peers_response.peers),
         },
+        "scatterPlot": json.dumps(scatterPlot),
     }
-
-    return render_template("channels.html", **content)
+    return render_template("channels.jinja", **content)
 
 
 @app.route("/events")

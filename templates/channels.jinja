@@ -49,7 +49,7 @@
           </h4>
         </div>
         <div class="ten wide column">
-          <div id="myDiv"></div>
+          <div id="pieChart"></div>
           <script>var data = [{
             values: [{{ stats.total_local_balance }}, {{ stats.total_remote_balance }}, {{ stats.total_commit }}],
             labels: ['Local Balance', 'Remote Balance', 'Commit Fees'],
@@ -77,8 +77,27 @@
             //width: 600,
             showlegend: true,
           };
+          Plotly.newPlot('pieChart', data, layout);</script>
 
-          Plotly.newPlot('myDiv', data, layout);</script>
+          <div id="scatterPlot"></div>
+          <script>
+            var data = [{{ scatterPlot }}];
+
+          var layout = {
+            title: 'Channels Capacities and relative Balances',
+            xaxis: {
+              range: [-6, 106],
+              title: {text: 'Local Share (in Percent)'}
+            },
+            yaxis: {
+              type: 'log',
+              title: {text: 'Capacity (in satoshis)'}
+            },
+            height: 350,
+            //width: 600,
+            showlegend: false,
+          };
+          Plotly.newPlot('scatterPlot', data, layout);</script>
         </div>
       </div>
     </div>
