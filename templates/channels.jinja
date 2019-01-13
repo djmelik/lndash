@@ -93,6 +93,24 @@
               type: 'log',
               title: {text: 'Capacity (in satoshis)'}
             },
+            shapes: [
+              {
+                  type: 'rect',
+                  xref: 'x', x0: '-20', x1: '20',
+                  yref: 'paper', y0: 0, y1: 1,
+                  fillcolor: '#ffe3e3',
+                  layer: "below",
+                  line: { width: 0 },
+              },
+              {
+                  type: 'rect',
+                  xref: 'x', x0: '80', x1: '120',
+                  yref: 'paper', y0: 0, y1: 1,
+                  fillcolor: '#ffe3e3',
+                  layer: "below",
+                  line: { width: 0 },
+              },
+            ],
             height: 350,
             //width: 600,
             showlegend: false,
