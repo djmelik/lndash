@@ -67,4 +67,10 @@ lnd_grpc_server = "127.0.0.1:10009"
 gunicorn main:app
 ```
 
+If you want gunicorn to listen on all interfaces and/or change the port, run the application using the following:
+
+```
+gunicorn main:app -b 0.0.0.0:8080
+```
+
 10. (Optional) You can set up an nginx reverse proxy and publicly expose your lndash instance. *Note: need to write these instructions.*
