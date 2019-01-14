@@ -1,3 +1,4 @@
+import config
 import time, datetime
 import libs.rpc_pb2 as ln
 import libs.rpc_pb2_grpc as lnrpc
@@ -15,18 +16,13 @@ app.testing = False
 cache = Cache(config={"CACHE_TYPE": "simple"})
 cache.init_app(app)
 
-# LND gRPC Variables
-macaroon_path = "config/readonly.macaroon"
-cert_path = "config/tls.cert"
-lnd_grpc_server = "127.0.0.1:10009"
 os.environ["GRPC_SSL_CIPHER_SUITES"] = "HIGH+ECDSA"
-macaroon = codecs.encode(open(macaroon_path, "rb").read(), "hex")
-cert = open(cert_path, "rb").read()
+macaroon = codecs.encode(open(config.macaroon_path, "rb").read(), "hex")
+cert = open(config.cert_path, "rb").read()
 
-# Set GRPC max receive length to 32 MiB
 grpc_options = [
-    ("grpc.max_receive_message_length", 33554432),
-    ("grpc.max_send_message_length", 33554432),
+    ("grpc.max_receive_message_length", config.grpc_max_length),
+    ("grpc.max_send_message_length", config.grpc_max_length),
 ]
 
 
@@ -37,7 +33,9 @@ def metadata_callback(context, callback):
 cert_creds = grpc.ssl_channel_credentials(cert)
 auth_creds = grpc.metadata_call_credentials(metadata_callback)
 combined_creds = grpc.composite_channel_credentials(cert_creds, auth_creds)
-channel = grpc.secure_channel(lnd_grpc_server, combined_creds, options=grpc_options)
+channel = grpc.secure_channel(
+    config.lnd_grpc_server, combined_creds, options=grpc_options
+)
 stub = lnrpc.LightningStub(channel)
 
 
