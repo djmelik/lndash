@@ -1,14 +1,35 @@
+import os, grpc, time, datetime
+from flask import Blueprint, render_template, request, jsonify
+
+import config
 import libs.rpc_pb2 as ln
 import libs.rpc_pb2_grpc as lnrpc
+from cache import cache
 
-from flask import render_template, request, json
+blueprint = Blueprint("views", __name__, template_folder="templates")
 
-from main import app, cache, channel
 
+def metadata_callback(context, callback):
+    callback([("macaroon", macaroon)], None)
+
+
+os.environ["GRPC_SSL_CIPHER_SUITES"] = "HIGH+ECDSA"
+macaroon = open(config.macaroon_path, "rb").read().hex()
+cert = open(config.cert_path, "rb").read()
+cert_creds = grpc.ssl_channel_credentials(cert)
+auth_creds = grpc.metadata_call_credentials(metadata_callback)
+combined_creds = grpc.composite_channel_credentials(cert_creds, auth_creds)
+grpc_options = [
+    ("grpc.max_receive_message_length", config.grpc_max_length),
+    ("grpc.max_send_message_length", config.grpc_max_length),
+]
+channel = grpc.secure_channel(
+    config.lnd_grpc_server, combined_creds, options=grpc_options
+)
 stub = lnrpc.LightningStub(channel)
 
 
-@app.route("/query", methods=["GET", "POST"])
+@blueprint.route("/query", methods=["GET", "POST"])
 def query():
     nodes = stub.DescribeGraph(ln.ChannelGraphRequest()).nodes
 
@@ -30,7 +51,7 @@ def query():
     return render_template("query.html", **content)
 
 
-@app.route("/")
+@blueprint.route("/")
 @cache.cached(timeout=60)
 def home():
     node_info = stub.GetInfo(ln.GetInfoRequest())
@@ -57,7 +78,7 @@ def home():
     return render_template("index.html", **content)
 
 
-@app.route("/channels")
+@blueprint.route("/channels")
 @cache.cached(timeout=60)
 def channels():
     peers = []
@@ -180,7 +201,7 @@ def channels():
     return render_template("channels.html", **content)
 
 
-@app.route("/events")
+@blueprint.route("/events")
 @cache.cached(timeout=60)
 def events():
     events = []
@@ -268,13 +289,13 @@ def events():
     return render_template("events.html", **content)
 
 
-@app.route("/map")
+@blueprint.route("/map")
 @cache.cached(timeout=600)
 def lightning_map():
     return render_template("map.html")
 
 
-@app.route("/map_data")
+@blueprint.route("/map_data")
 @cache.cached(timeout=1800)
 def map_data():
     response = stub.DescribeGraph(ln.ChannelGraphRequest())
@@ -293,7 +314,4 @@ def map_data():
 
     map_data = {"nodes": nodes, "links": links}
 
-    content = app.response_class(
-        response=json.dumps(map_data), status=200, mimetype="application/json"
-    )
-    return content
+    return jsonify(map_data)

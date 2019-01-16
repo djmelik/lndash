@@ -1,22 +1,22 @@
-import jinja2
-import flask
+from flask import Blueprint
+from jinja2 import contextfilter
 
-blueprint = flask.Blueprint("filters", __name__)
+blueprint = Blueprint("filters", __name__)
 
 
-@jinja2.contextfilter
+@contextfilter
 @blueprint.app_template_filter()
 def format_thousands_int(context, n):
     return "{0:,d}".format(int(n))
 
 
-@jinja2.contextfilter
+@contextfilter
 @blueprint.app_template_filter()
 def format_thousands_float(context, n):
     return "{0:,.2f}".format(n)
 
 
-@jinja2.contextfilter
+@contextfilter
 @blueprint.app_template_filter()
 def convert_bytes(context, n):
     # keep the following list sorted
