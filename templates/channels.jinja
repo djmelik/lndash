@@ -49,7 +49,7 @@
           </h4>
         </div>
         <div class="ten wide column">
-          <div id="myDiv"></div>
+          <div id="pieChart"></div>
           <script>var data = [{
             values: [{{ stats.total_local_balance }}, {{ stats.total_remote_balance }}, {{ stats.total_commit }}],
             labels: ['Local Balance', 'Remote Balance', 'Commit Fees'],
@@ -77,10 +77,51 @@
             //width: 600,
             showlegend: true,
           };
-
-          Plotly.newPlot('myDiv', data, layout);</script>
+          Plotly.newPlot('pieChart', data, layout);</script>
         </div>
       </div>
+    </div>
+    <div class="ui attached segment">
+      <div id="scatterPlot"></div>
+      <script>
+        var data = [{{ scatterPlot }}];
+
+        var layout = {
+        title: 'Channel Capacities and Relative Balances',
+        xaxis: {
+          range: [0, 100],
+          ticksuffix: '%',
+          title: {text: 'Local Balance (%)'}
+        },
+        yaxis: {
+          type: 'log',
+          ticksuffix: ' sats',
+          showticksuffix: false,
+          showgrid: false,
+          title: {text: 'Capacity (in satoshis)'}
+        },
+        shapes: [
+          {
+              type: 'rect',
+              xref: 'x', x0: '0', x1: '20',
+              yref: 'paper', y0: 0, y1: 1,
+              fillcolor: '#DB282820',
+              layer: "below",
+              line: { width: 0 },
+          },
+          {
+              type: 'rect',
+              xref: 'x', x0: '80', x1: '100',
+              yref: 'paper', y0: 0, y1: 1,
+              fillcolor: '#DB282820',
+              layer: "below",
+              line: { width: 0 },
+          },
+        ],
+        height: 400,
+        showlegend: false,
+      };
+      Plotly.newPlot('scatterPlot', data, layout);</script>
     </div>
   </div>
   {% for peer in peers %}
