@@ -82,12 +82,12 @@
       </div>
     </div>
     <div class="ui attached segment">
-      <div id="scatterPlot"></div>
+      <div id="scatterPlotCapacity"></div>
       <script>
-        var data = [{{ scatterPlot }}];
+        var data = [{{ scatterPlotCapacity }}];
 
         var layout = {
-        title: 'Channel Capacities and Relative Balances',
+        title: 'Channel Capacity vs Relative Balance',
         xaxis: {
           range: [0, 100],
           ticksuffix: '%',
@@ -121,7 +121,48 @@
         height: 400,
         showlegend: false,
       };
-      Plotly.newPlot('scatterPlot', data, layout);</script>
+      Plotly.newPlot('scatterPlotCapacity', data, layout);</script>
+    </div>
+    <div class="ui attached segment">
+      <div id="scatterPlotActivity"></div>
+      <script>
+        var data = [{{ scatterPlotActivity }}];
+
+        var layout = {
+        title: 'Channel Activity vs Relative Balance',
+        xaxis: {
+          range: [0, 100],
+          ticksuffix: '%',
+          title: {text: 'Local Balance (%)'}
+        },
+        yaxis: {
+          ticksuffix: '%',
+          showticksuffix: false,
+          showgrid: false,
+          title: {text: 'Activity (%) = (sent+received)/capacity'}
+        },
+        shapes: [
+          {
+              type: 'rect',
+              xref: 'x', x0: '0', x1: '20',
+              yref: 'paper', y0: 0, y1: 1,
+              fillcolor: '#DB282820',
+              layer: "below",
+              line: { width: 0 },
+          },
+          {
+              type: 'rect',
+              xref: 'x', x0: '80', x1: '100',
+              yref: 'paper', y0: 0, y1: 1,
+              fillcolor: '#DB282820',
+              layer: "below",
+              line: { width: 0 },
+          },
+        ],
+        height: 400,
+        showlegend: false,
+      };
+      Plotly.newPlot('scatterPlotActivity', data, layout);</script>
     </div>
   </div>
   {% for peer in peers %}

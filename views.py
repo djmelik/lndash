@@ -91,17 +91,23 @@ def channels():
     bytes_sent = 0
     bytes_received = 0
     channel_count = 0
-    scatterPlot = {
+    scatterPlotCapacity = {
         "ids": [],
         "x": [],
         "y": [],
-        "mode": 'markers',
-        "type": 'scatter',
+        "mode": "markers",
+        "type": "scatter",
         "hovertext": [],
-        "marker": {
-            "size": 12,
-            "color": [],
-        }
+        "marker": {"size": 12, "color": []},
+    }
+    scatterPlotActivity = {
+        "ids": [],
+        "x": [],
+        "y": [],
+        "mode": "markers",
+        "type": "scatter",
+        "hovertext": [],
+        "marker": {"size": 12, "color": []},
     }
 
     peers_response = stub.ListPeers(ln.ListPeersRequest())
@@ -140,11 +146,17 @@ def channels():
         peer_filter = [x for x in peers if x["pub_key"] == channel.remote_pubkey]
         index = peers.index(peer_filter[0])
 
-        scatterPlot["ids"].append(channel.chan_id)
-        scatterPlot["y"].append(int(channel.capacity))
-        scatterPlot["x"].append(round(100.0 * channel.local_balance / channel.capacity, 2))
-        scatterPlot["hovertext"].append(peers[index]["alias"])
-        scatterPlot["marker"]["color"].append(str(peers[index]["color"]))
+        scatterPlotCapacity["ids"].append(channel.chan_id)
+        scatterPlotCapacity["y"].append(int(channel.capacity))
+        scatterPlotCapacity["x"].append(round(100.0 * channel.local_balance / channel.capacity, 2))
+        scatterPlotCapacity["hovertext"].append(peers[index]["alias"])
+        scatterPlotCapacity["marker"]["color"].append(str(peers[index]["color"]))
+
+        scatterPlotActivity["ids"].append(channel.chan_id)
+        scatterPlotActivity["y"].append(round(100.0 * (channel.total_satoshis_sent + channel.total_satoshis_received) / channel.capacity), 2)
+        scatterPlotActivity["x"].append(round(100.0 * channel.local_balance / channel.capacity, 2))
+        scatterPlotActivity["hovertext"].append(peers[index]["alias"])
+        scatterPlotActivity["marker"]["color"].append(str(peers[index]["color"]))
 
         try:
             chan_info = stub.GetChanInfo(ln.ChanInfoRequest(chan_id=channel.chan_id))
@@ -214,7 +226,8 @@ def channels():
             "channel_count": len(channels_response.channels),
             "peer_count": len(peers_response.peers),
         },
-        "scatterPlot": json.dumps(scatterPlot),
+        "scatterPlotCapacity": json.dumps(scatterPlotCapacity),
+        "scatterPlotActivity": json.dumps(scatterPlotActivity),
     }
 
     return render_template("channels.jinja", **content)
