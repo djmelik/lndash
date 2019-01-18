@@ -93,6 +93,6 @@ Three things need to be configured to run the `lndash` docker container.
 
 These can all be configured via the docker command line, as follows:
 ```
-docker run -d --restart -v=/home/ubuntu/lndashcredentials:/usr/src/app/config -p 80:8000 -e LNDASH_LND_SERVER='192.168.1.2:10009' lndash:latest
+docker run -d --restart -v=/home/ubuntu/lndashcredentials:/usr/src/app/configuration -p 80:8000 -e LNDASH_LND_SERVER='192.168.1.2:10009' lndash:latest
 ```
 The above command line assumes tls.cert and readonly.macaroon have been copied to the directory `/home/ubuntu/lndashcredentials`, and that the LND server is available on port 10009 at IP address 192.168.1.2. It makes the `lndash` server available on port 80.
