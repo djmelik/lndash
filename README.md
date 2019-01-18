@@ -87,12 +87,13 @@ This will build the docker container and give it the tag `lndash`.
 ### Running the docker container
 Three things need to be configured to run the `lndash` docker container.
 
-1. The path to the TLS certificate and readonly macaroon.
-2. The port on which the web app should listen.
-3. The LND server's RPC address
+1. The path to the TLS certificate.
+2. The path to the readonly macaroon.
+3. The port on which the web app should listen.
+4. The LND server's RPC address
 
 These can all be configured via the docker command line, as follows:
 ```
-docker run -d --restart -v=/home/ubuntu/lndashcredentials:/usr/src/app/configuration -p 80:8000 -e LNDASH_LND_SERVER='192.168.1.2:10009' lndash:latest
+docker run -d --restart -v=/home/ubuntu/lndashcredentials/tls.cert:/usr/src/app/config/tls.cert -v=/home/ubuntu/lndashcredentials/readonly.macaroon:/usr/src/app/config/readonly.macaroon -p 80:8000 -e LNDASH_LND_SERVER='192.168.1.2:10009' lndash:latest
 ```
 The above command line assumes tls.cert and readonly.macaroon have been copied to the directory `/home/ubuntu/lndashcredentials`, and that the LND server is available on port 10009 at IP address 192.168.1.2. It makes the `lndash` server available on port 80.
