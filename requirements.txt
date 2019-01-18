@@ -1,10 +1,6 @@
 Click==7.0
-enum34==1.1.6
 Flask==1.0.2
-Flask-Cache==0.13.1
 Flask-Caching==1.4.0
-Flask-QRcode==2.0.2
-futures==3.2.0
 googleapis-common-protos==1.5.5
 grpcio==1.17.1
 grpcio-tools==1.17.1
@@ -12,9 +8,6 @@ gunicorn==19.9.0
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.0
-Pillow==5.3.0
 protobuf==3.6.1
-protobuf-to-dict==0.1.0
-qrcode==6.0
 six==1.12.0
 Werkzeug==0.14.1

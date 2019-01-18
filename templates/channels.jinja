@@ -43,14 +43,18 @@
           <h4 class="ui header">Inbound Payments
             <div class="sub header">{{ stats.total_received|format_thousands_int }} satoshis</div>
           </h4>
+          <div class="ui clearing divider"></div>
+          <h4 class="ui header">Commit Fees
+            <div class="sub header">{{ stats.total_commit|format_thousands_int }} satoshis</div>
+          </h4>
         </div>
         <div class="ten wide column">
-          <div id="myDiv"></div>
+          <div id="pieChart"></div>
           <script>var data = [{
-            values: [{{ stats.total_local_balance }}, {{ stats.total_remote_balance }}],
-            labels: ['Local Balance', 'Remote Balance'],
+            values: [{{ stats.total_local_balance }}, {{ stats.total_remote_balance }}, {{ stats.total_commit }}],
+            labels: ['Local Balance', 'Remote Balance', 'Commit Fees'],
             marker: {
-              colors: ['#2185D0', '#DB2828' ],
+              colors: ['#2185D0', '#DB2828', '#21BA45'],
             },
             domain: {column: 0},
             name: '',
@@ -73,10 +77,51 @@
             //width: 600,
             showlegend: true,
           };
-
-          Plotly.newPlot('myDiv', data, layout);</script>
+          Plotly.newPlot('pieChart', data, layout);</script>
         </div>
       </div>
+    </div>
+    <div class="ui attached segment">
+      <div id="scatterPlot"></div>
+      <script>
+        var data = [{{ scatterPlot }}];
+
+        var layout = {
+        title: 'Channel Capacities and Relative Balances',
+        xaxis: {
+          range: [0, 100],
+          ticksuffix: '%',
+          title: {text: 'Local Balance (%)'}
+        },
+        yaxis: {
+          type: 'log',
+          ticksuffix: ' sats',
+          showticksuffix: false,
+          showgrid: false,
+          title: {text: 'Capacity (in satoshis)'}
+        },
+        shapes: [
+          {
+              type: 'rect',
+              xref: 'x', x0: '0', x1: '20',
+              yref: 'paper', y0: 0, y1: 1,
+              fillcolor: '#DB282820',
+              layer: "below",
+              line: { width: 0 },
+          },
+          {
+              type: 'rect',
+              xref: 'x', x0: '80', x1: '100',
+              yref: 'paper', y0: 0, y1: 1,
+              fillcolor: '#DB282820',
+              layer: "below",
+              line: { width: 0 },
+          },
+        ],
+        height: 400,
+        showlegend: false,
+      };
+      Plotly.newPlot('scatterPlot', data, layout);</script>
     </div>
   </div>
   {% for peer in peers %}
@@ -86,7 +131,14 @@
       <div class="ui grid">
         <div class="three wide column">
           {% set uri = peer.pub_key + "@" + peer.address %}
-          <img src="{{ qrcode(uri, box_size=2.5 ) }}"></img>
+          <div id="qrcode-{{ uri }}"></div>
+          <script type="text/javascript">
+            new QRCode(document.getElementById("qrcode-{{ uri }}"), {
+              text: "{{ uri }}",
+              width: 128,
+              height: 128,
+            });
+          </script>
           <div class="ui divided relaxed list">
             <div class="item">
               <div class="content">
