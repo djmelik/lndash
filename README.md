@@ -55,10 +55,10 @@ cp ~/.lnd/tls.cert config/tls.cert
 cp ~/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon config/readonly.macaroon
 ```
 
-8. (Optional) If lnd is installed on a remote host, edit `config/__init__.py` and update lnd's server IP.
+8. (Optional) If lnd is installed on a remote host, define an environment variable pointing to that host:
 
-```python
-lnd_grpc_server = "127.0.0.1:10009"
+```sh
+export LNDASH_LND_SERVER="127.0.0.1:10009"
 ```
 
 9. Run the application.
