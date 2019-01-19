@@ -61,6 +61,12 @@ cp ~/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon config/readonly.macaroon
 lnd_grpc_server = "127.0.0.1:10009"
 ```
 
+Or define an environment variable pointing to your remove host.
+
+```sh
+export LNDASH_LND_SERVER="127.0.0.1:10009"
+```
+
 9. Run the application.
 
 ```
