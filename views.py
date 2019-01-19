@@ -249,7 +249,7 @@ def events():
     )
 
     for event in events_response.forwarding_events:
-        tx_date = datetime.datetime.fromtimestamp(event.timestamp).strftime("%y-%m-%d")
+        tx_date = datetime.datetime.fromtimestamp(event.timestamp).strftime("%Y-%m-%d")
         tx_size = event.amt_out
         tx_fee = event.fee
 
