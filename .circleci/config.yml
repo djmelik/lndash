@@ -1,0 +1,16 @@
+workflows:
+  version: 2
+  lndash:
+    jobs:
+      - black
+
+version: 2
+jobs:
+  black:
+    docker:
+      - image: python
+    steps:
+      - checkout
+      - run: pip install black
+      # Exclude libs/ as this is generated code
+      - run: black --check --exclude libs/ .
