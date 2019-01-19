@@ -95,13 +95,10 @@ def channels():
         "ids": [],
         "x": [],
         "y": [],
-        "mode": 'markers',
-        "type": 'scatter',
+        "mode": "markers",
+        "type": "scatter",
         "hovertext": [],
-        "marker": {
-            "size": 12,
-            "color": [],
-        }
+        "marker": {"size": 12, "color": []},
     }
 
     peers_response = stub.ListPeers(ln.ListPeersRequest())
@@ -142,7 +139,9 @@ def channels():
 
         scatterPlot["ids"].append(channel.chan_id)
         scatterPlot["y"].append(int(channel.capacity))
-        scatterPlot["x"].append(round(100.0 * channel.local_balance / channel.capacity, 2))
+        scatterPlot["x"].append(
+            round(100.0 * channel.local_balance / channel.capacity, 2)
+        )
         scatterPlot["hovertext"].append(peers[index]["alias"])
         scatterPlot["marker"]["color"].append(str(peers[index]["color"]))
 
