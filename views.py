@@ -153,8 +153,9 @@ def channels():
         scatterPlotCapacity["marker"]["color"].append(str(peers[index]["color"]))
 
         scatterPlotActivity["ids"].append(channel.chan_id)
-        scatterPlotActivity["y"].append(round(100.0 * (channel.total_satoshis_sent + channel.total_satoshis_received) / channel.capacity), 2)
-        scatterPlotActivity["x"].append(round(100.0 * channel.local_balance / channel.capacity, 2))
+        scatterPlotActivity["y"].append(int(channel.capacity))
+        scatterPlotActivity["x"].append(round(100.0 * (channel.total_satoshis_sent + channel.total_satoshis_received) / channel.capacity, 2))
+        #scatterPlotActivity["x"].append(round(100.0 * channel.local_balance / channel.capacity, 2))
         scatterPlotActivity["hovertext"].append(peers[index]["alias"])
         scatterPlotActivity["marker"]["color"].append(str(peers[index]["color"]))
 
