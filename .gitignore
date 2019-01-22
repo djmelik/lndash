@@ -106,3 +106,6 @@ venv.bak/
 # lnd
 config/*.macaroon
 config/*.cert
+
+# Visual Studio Code
+.vscode/
