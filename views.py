@@ -231,7 +231,7 @@ def channels():
         "scatterPlotActivity": json.dumps(scatterPlotActivity),
     }
 
-    return render_template("channels.jinja", **content)
+    return render_template("channels.html", **content)
 
 
 @blueprint.route("/events")
