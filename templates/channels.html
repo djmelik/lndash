@@ -245,22 +245,30 @@
                     </div>
                   </div>
                   <div class="ui compact mini menu">
-                    <a class="item">
-                      <i class="arrow alternate circle right icon"></i>Base Fee
-                      <div class="floating ui blue mini label">{{ channel.local_policy.fee_base_msat }}</div>
-                    </a>
-                    <a class="item">
-                      <i class="icon percent"></i>Fee Rate
-                      <div class="floating ui blue mini label">{{ channel.local_policy.fee_rate }}</div>
-                    </a>
-                    <a class="item">
-                      <i class="icon key"></i>Min HTLC
-                      <div class="floating ui blue mini label">{{ channel.local_policy.min_htlc }}</div>
-                    </a>
-                    <a class="item">
-                      <i class="icon clock outline"></i> Time Lock Delta
-                      <div class="floating ui blue mini label">{{ channel.local_policy.time_lock_delta }}</div>
-                    </a>
+                    <span data-tooltip="Base fee in milli-satoshis that will be charged for each forwarded HTLC, regardless of payment size." data-position="bottom center">
+                      <a class="item">
+                        <i class="arrow alternate circle right icon"></i>Base Fee
+                        <div class="floating ui blue mini label">{{ channel.local_policy.fee_base_msat }}</div>
+                      </a>
+                    </span>
+                    <span data-tooltip="Fee rate that will be charged proportionally based on the value of each forwarded HTLC." data-position="bottom center">
+                      <a class="item">
+                        <i class="icon percent"></i>Fee Rate
+                        <div class="floating ui blue mini label">{{ channel.local_policy.fee_rate }}</div>
+                      </a>
+                    </span>
+                    <span data-tooltip="The minimum value in millisatoshis required for incoming HTLCs on the channel." data-position="bottom center">
+                      <a class="item">
+                        <i class="icon key"></i>Min HTLC
+                        <div class="floating ui blue mini label">{{ channel.local_policy.min_htlc }}</div>
+                      </a>
+                    </span>
+                    <span data-tooltip="The timelock delta that will be applied to all forwarded HTLCs." data-position="bottom center">
+                      <a class="item">
+                        <i class="icon clock outline"></i> Time Lock Delta
+                        <div class="floating ui blue mini label">{{ channel.local_policy.time_lock_delta }}</div>
+                      </a>
+                    </span>
                   </div>
                 </div>
                 <div class="column">
@@ -281,22 +289,30 @@
                     </div>
                   </div>
                   <div class="ui compact mini menu">
-                    <a class="item">
-                      <i class="arrow alternate circle right icon"></i>Base Fee
-                      <div class="floating ui red mini label">{{ channel.remote_policy.fee_base_msat }}</div>
-                    </a>
-                    <a class="item">
-                      <i class="icon percent"></i>Fee Rate
-                      <div class="floating ui red mini label">{{ channel.remote_policy.fee_rate }}</div>
-                    </a>
-                    <a class="item">
-                      <i class="icon key"></i>Min HTLC
-                      <div class="floating ui red mini label">{{ channel.remote_policy.min_htlc }}</div>
-                    </a>
-                    <a class="item">
-                      <i class="icon clock outline"></i>Time Lock Delta
-                      <div class="floating ui red mini label">{{ channel.remote_policy.time_lock_delta }}</div>
-                    </a>
+                    <span data-tooltip="Base fee in milli-satoshis that will be charged for each forwarded HTLC, regardless of payment size." data-position="bottom center">
+                      <a class="item">
+                        <i class="arrow alternate circle right icon"></i>Base Fee
+                        <div class="floating ui red mini label">{{ channel.remote_policy.fee_base_msat }}</div>
+                      </a>
+                    </span>
+                    <span data-tooltip="Fee rate that will be charged proportionally based on the value of each forwarded HTLC." data-position="bottom center">
+                      <a class="item">
+                        <i class="icon percent"></i>Fee Rate
+                        <div class="floating ui red mini label">{{ channel.remote_policy.fee_rate }}</div>
+                      </a>
+                    </span>
+                    <span data-tooltip="The minimum value in millisatoshis required for incoming HTLCs on the channel." data-position="bottom center">
+                      <a class="item">
+                        <i class="icon key"></i>Min HTLC
+                        <div class="floating ui red mini label">{{ channel.remote_policy.min_htlc }}</div>
+                      </a>
+                    </span>
+                    <span data-tooltip="The timelock delta that will be applied to all forwarded HTLCs." data-position="bottom center">
+                      <a class="item">
+                        <i class="icon clock outline"></i>Time Lock Delta
+                        <div class="floating ui red mini label">{{ channel.remote_policy.time_lock_delta }}</div>
+                      </a>
+                    </span>
                   </div>
                 </div>
               </div>
