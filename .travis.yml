@@ -1,0 +1,17 @@
+language: python
+
+sudo: false
+
+# Saves pip downloads/wheels between builds
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+python:
+  - "3.6"
+
+install:
+    - pip install black
+
+script:
+    - black --check *.py config/*.py
