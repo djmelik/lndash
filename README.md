@@ -2,9 +2,10 @@
 
 [![Build Status](https://travis-ci.org/djmelik/lndash.svg?branch=master)](https://travis-ci.org/djmelik/lndash)
 
-lndash is a simple read-only web dashboard for lnd.
+lndash is a simple read-only web dashboard for [lnd](https://github.com/lightningnetwork/lnd) - Lightning Network Daemon.
 
 ## Features
+
 * Peer view
 * Channel view
 * Forwarding Events (routed payments) view
@@ -12,6 +13,7 @@ lndash is a simple read-only web dashboard for lnd.
 * Lightning Network Graph
 
 ## Installation
+
 *Please note that the following installation instructions are still a work in progress. This guide was written on a Debian system.*
 
 1. Install dependencies.
