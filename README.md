@@ -1,5 +1,7 @@
 # lndash
 
+[![Build Status](https://travis-ci.org/djmelik/lndash.svg?branch=master)](https://travis-ci.org/djmelik/lndash)
+
 lndash is a simple read-only web dashboard for lnd.
 
 ## Features
