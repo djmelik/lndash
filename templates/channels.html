@@ -83,7 +83,7 @@
     <div class="ui attached segment">
       <div id="scatterPlotCapacity"></div>
       <script>
-        var data = [{{ scatterPlotCapacity }}];
+        var data = [{{ scatterPlotCapacity|safe }}];
 
         var layout = {
         title: 'Channel Capacity vs Relative Balance',
@@ -124,7 +124,7 @@
     <div class="ui attached segment">
       <div id="scatterPlotActivity"></div>
       <script>
-        var data = [{{ scatterPlotActivity }}];
+        var data = [{{ scatterPlotActivity|safe }}];
 
         var layout = {
         title: 'Channel Capacity vs Channel Activity',
