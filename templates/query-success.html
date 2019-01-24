@@ -1,6 +1,8 @@
 <!doctype html>
 {% extends "layout.html" %}
 {% block body %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 <div class="ui container">
   <div class="ui segments">
     <h4 class="ui top sub attached header">Overview</h4>
@@ -25,6 +27,39 @@
       </div>
     </form>
   </div>
+  <div class="ui segments">
+    <h4 class="ui top sub attached header">Map</h4>
+    <div class="ui attached segment">
+      <div id="route-path" style="height: 500px;"></div>
+      <script type="text/javascript">
+        var container = document.getElementById('route-path');
+        var data = {{ map_data|safe }};
+        var options = {
+          nodes: {
+            shape: 'dot',
+            borderWidth: 1,
+            borderWidthSelected: 2,
+            scaling: {
+              min: 10,
+              max: 20,
+            },
+          },
+          interaction: {
+            hover: true
+          },
+          physics: {
+            forceAtlas2Based: {
+              gravitationalConstant: -75,
+              springLength: 100,
+              damping: 0.5,
+            },
+            solver: "forceAtlas2Based"
+          },
+        };
+        var network = new vis.Network(container, data, options);
+      </script>
+    </div>
+  </div>
   {% for route in routes %}
   <div class="ui segments">
     <h4 class="ui top sub attached header">Route #{{ loop.index }}</h4>
@@ -32,27 +67,23 @@
       <table class="ui compact table">
         <thead>
           <tr>
-            <th>Hop</th>
-            <th>Channel</th>
-            <th>Node</th>
+            <th class="one wide">Hop</th>
+            <th class="five wide">Node</th>
+            <th class="three wide">Channel</th>
             <th>Capacity</th>
             <th>Forward (sat)</th>
             <th>Fee (sat)</th>
-            <th>Forward (msat)</th>
-            <th>Fee (msat)</th>
           </tr>
         </thead>
         <tbody>
           {% for hop in route.hops %}
           <tr>
             <td>{{ loop.index }}</td>
+            <td><i class="stop icon" style="color: {{ hop.node_color }}"></i>{{ hop.node_alias }}</td>
             <td>{{ hop.chan_id }}</td>
-            <td>{{ hop.pub_key }}</td>
-            <td>{{ hop.chan_capacity }}</td>
-            <td>{{ hop.amt_to_forward }}</td>
-            <td>{{ hop.fee }}</td>
-            <td>{{ hop.amt_to_forward_msat }}</td>
-            <td>{{ hop.fee_msat }}</td>
+            <td>{{ hop.chan_capacity|format_thousands_int }}</td>
+            <td>{{ hop.amt_to_forward|format_thousands_float }}</td>
+            <td>{{ hop.fee|format_thousands_float }}</td>
           </tr>
         </tbody>
         {% endfor %}

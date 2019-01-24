@@ -33,9 +33,25 @@ stub = lnrpc.LightningStub(channel)
 def query():
     nodes = stub.DescribeGraph(ln.ChannelGraphRequest()).nodes
 
-    content = {"nodes": nodes, "node_count": len(nodes)}
+    content = {"nodes": nodes, "node_count": len(nodes), "routes": []}
 
     if request.method == "POST":
+        map_data = {
+            "edges": [],
+            "nodes": [],
+        }
+
+        # Add Local Node to map data
+        local_node = stub.GetInfo(ln.GetInfoRequest())
+        local_node_info = stub.GetNodeInfo(
+            ln.NodeInfoRequest(pub_key=local_node.identity_pubkey)
+        )
+        map_data['nodes'].append({
+            "id": local_node_info.node.pub_key,
+            "label": local_node_info.node.alias,
+            "color": local_node_info.node.color,
+        })
+
         routes_list = stub.QueryRoutes(
             ln.QueryRoutesRequest(
                 pub_key=request.form["node-result"],
@@ -44,7 +60,61 @@ def query():
             )
         ).routes
 
-        content.update({"routes": routes_list})
+        for route in routes_list:
+            hops = []
+
+            for hop in route.hops:
+                node_info = stub.GetNodeInfo(
+                    ln.NodeInfoRequest(pub_key=hop.pub_key)
+                )
+                chan_info = stub.GetChanInfo(
+                    ln.ChanInfoRequest(chan_id=hop.chan_id)
+                )
+
+                node = {
+                    "id": node_info.node.pub_key,
+                    "label": node_info.node.alias,
+                    "color": node_info.node.color,
+                }
+                if hop.pub_key == chan_info.node1_pub:
+                    edge = {
+                        "from": chan_info.node2_pub,
+                        "to": chan_info.node1_pub,
+                        "label": chan_info.channel_id,
+                        "arrows": "to",
+                        "font": "{align: 'middle'}",
+                    }
+                else:
+                    edge = {
+                        "from": chan_info.node1_pub,
+                        "to": chan_info.node2_pub,
+                        "label": chan_info.channel_id,
+                        "arrows": "to",
+                        "font": "{align: 'middle'}",
+                    }
+
+                if node not in map_data['nodes']:
+                    map_data['nodes'].append(node)
+                if edge not in map_data['edges']:
+                    map_data['edges'].append(edge)
+
+                hops.append({
+                    "chan_id": hop.chan_id,
+                    "chan_capacity": hop.chan_capacity,
+                    "amt_to_forward": hop.amt_to_forward_msat / 1000,
+                    "fee": hop.fee_msat / 1000,
+                    "pub_key": hop.pub_key,
+                    "node_alias": node_info.node.alias,
+                    "node_color": node_info.node.color,
+                })
+
+            content["routes"].append({
+                "hops": hops,
+                "total_amt": route.total_amt_msat / 1000,
+                "total_fees": route.total_fees_msat / 1000,
+            })
+
+        content.update({'map_data': json.dumps(map_data)})
 
         return render_template("query-success.html", **content)
 
