@@ -36,21 +36,20 @@ def query():
     content = {"nodes": nodes, "node_count": len(nodes), "routes": []}
 
     if request.method == "POST":
-        map_data = {
-            "edges": [],
-            "nodes": [],
-        }
+        map_data = {"edges": [], "nodes": []}
 
         # Add Local Node to map data
         local_node = stub.GetInfo(ln.GetInfoRequest())
         local_node_info = stub.GetNodeInfo(
             ln.NodeInfoRequest(pub_key=local_node.identity_pubkey)
         )
-        map_data['nodes'].append({
-            "id": local_node_info.node.pub_key,
-            "label": local_node_info.node.alias,
-            "color": local_node_info.node.color,
-        })
+        map_data["nodes"].append(
+            {
+                "id": local_node_info.node.pub_key,
+                "label": local_node_info.node.alias,
+                "color": local_node_info.node.color,
+            }
+        )
 
         routes_list = stub.QueryRoutes(
             ln.QueryRoutesRequest(
@@ -64,12 +63,8 @@ def query():
             hops = []
 
             for hop in route.hops:
-                node_info = stub.GetNodeInfo(
-                    ln.NodeInfoRequest(pub_key=hop.pub_key)
-                )
-                chan_info = stub.GetChanInfo(
-                    ln.ChanInfoRequest(chan_id=hop.chan_id)
-                )
+                node_info = stub.GetNodeInfo(ln.NodeInfoRequest(pub_key=hop.pub_key))
+                chan_info = stub.GetChanInfo(ln.ChanInfoRequest(chan_id=hop.chan_id))
 
                 node = {
                     "id": node_info.node.pub_key,
@@ -93,28 +88,32 @@ def query():
                         "font": "{align: 'middle'}",
                     }
 
-                if node not in map_data['nodes']:
-                    map_data['nodes'].append(node)
-                if edge not in map_data['edges']:
-                    map_data['edges'].append(edge)
+                if node not in map_data["nodes"]:
+                    map_data["nodes"].append(node)
+                if edge not in map_data["edges"]:
+                    map_data["edges"].append(edge)
 
-                hops.append({
-                    "chan_id": hop.chan_id,
-                    "chan_capacity": hop.chan_capacity,
-                    "amt_to_forward": hop.amt_to_forward_msat / 1000,
-                    "fee": hop.fee_msat / 1000,
-                    "pub_key": hop.pub_key,
-                    "node_alias": node_info.node.alias,
-                    "node_color": node_info.node.color,
-                })
+                hops.append(
+                    {
+                        "chan_id": hop.chan_id,
+                        "chan_capacity": hop.chan_capacity,
+                        "amt_to_forward": hop.amt_to_forward_msat / 1000,
+                        "fee": hop.fee_msat / 1000,
+                        "pub_key": hop.pub_key,
+                        "node_alias": node_info.node.alias,
+                        "node_color": node_info.node.color,
+                    }
+                )
 
-            content["routes"].append({
-                "hops": hops,
-                "total_amt": route.total_amt_msat / 1000,
-                "total_fees": route.total_fees_msat / 1000,
-            })
+            content["routes"].append(
+                {
+                    "hops": hops,
+                    "total_amt": route.total_amt_msat / 1000,
+                    "total_fees": route.total_fees_msat / 1000,
+                }
+            )
 
-        content.update({'map_data': json.dumps(map_data)})
+        content.update({"map_data": json.dumps(map_data)})
 
         return render_template("query-success.html", **content)
 
