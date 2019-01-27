@@ -31,6 +31,8 @@ virtualenv -p python3 venv
 source venv/bin/activate
 ```
 
+Make sure you have installed Python 3 virtualenv, not Python 2 as this is not supported.
+
 3. Install python libs & dependencies into running virtualenv:
 
 ```sh

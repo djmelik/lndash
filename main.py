@@ -1,3 +1,8 @@
+import sys
+
+if sys.version_info.major != 3:
+    raise OSError("Python 3 is required")
+
 from flask import Flask
 
 import filters
