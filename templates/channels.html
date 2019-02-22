@@ -216,8 +216,11 @@
               <a class="ui green ribbon label">Active</a>
             {% else %}
             <div class="ui red attached segment">
-              <a class="ui green ribbon label">Inactive</a>
+              <a class="ui red ribbon label">Inactive</a>
             {% endif %}
+              {% if channel.private == True %}
+              <span class="ui yellow label">Private</span>
+              {% endif %}
               <div class="ui blue progress" id="balance{{ channel.chan_id }}">
                 <div class="bar">
                   <div class="progress"></div>

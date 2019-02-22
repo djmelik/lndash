@@ -180,7 +180,7 @@ def channels():
     }
 
     peers_response = stub.ListPeers(ln.ListPeersRequest())
-    channels_response = stub.ListChannels(ln.ListChannelsRequest(active_only=True))
+    channels_response = stub.ListChannels(ln.ListChannelsRequest(active_only=False))
 
     for peer in peers_response.peers:
         try:
@@ -213,7 +213,10 @@ def channels():
 
     for channel in channels_response.channels:
         peer_filter = [x for x in peers if x["pub_key"] == channel.remote_pubkey]
-        index = peers.index(peer_filter[0])
+        try:
+            index = peers.index(peer_filter[0])
+        except IndexError as e:
+            continue; # continue if channel is inactive due to disconnected peer
 
         scatterPlotCapacity["ids"].append(channel.chan_id)
         scatterPlotCapacity["y"].append(int(channel.capacity))
@@ -271,6 +274,7 @@ def channels():
         peers[index]["channels"].append(
             {
                 "active": channel.active,
+                "private": channel.private,
                 "chan_id": channel.chan_id,
                 "capacity": channel.capacity,
                 "commit_fee": channel.commit_fee,
