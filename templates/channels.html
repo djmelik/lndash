@@ -170,8 +170,14 @@
             </div>
             <div class="item">
               <div class="content">
+                <div class="header">Capacity</div>
+                <div class="description">{{ peer.capacity|format_thousands_int }} satoshis</div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="content">
                 <div class="header">Channel Count</div>
-                <div class="description">{{ peer.channels|length }} channels</div>
+                <div class="description">{{ peer.channels|length }} ({{ peer.num_channels }}) channels</div>
               </div>
             </div>
             <div class="item">

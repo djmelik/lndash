@@ -189,9 +189,13 @@ def channels():
             )
             node_alias = node_info_response.node.alias
             node_color = node_info_response.node.color
+            node_num_channels = node_info_response.num_channels
+            node_capacity = node_info_response.total_capacity
         except grpc.RpcError:
             node_alias = ""
             node_color = ""
+            node_channels = 0
+            node_capacity = 0
 
         peers.append(
             {
@@ -204,6 +208,8 @@ def channels():
                 "sats_sent": peer.sat_sent,
                 "sats_received": peer.sat_recv,
                 "ping_time": peer.ping_time,
+                "num_channels": node_num_channels,
+                "capacity": node_capacity,
                 "channels": [],
             }
         )
