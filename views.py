@@ -222,7 +222,8 @@ def channels():
         try:
             index = peers.index(peer_filter[0])
         except IndexError as e:
-            continue; # continue if channel is inactive due to disconnected peer
+            # continue if channel is inactive due to disconnected peer
+            continue
 
         scatterPlotCapacity["ids"].append(channel.chan_id)
         scatterPlotCapacity["y"].append(int(channel.capacity))
