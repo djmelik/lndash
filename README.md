@@ -83,7 +83,7 @@ docker run -d --rm \
   -v=$HOME/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon:/usr/src/app/config/readonly.macaroon \
   -p 8000:8000 \
   -e LNDASH_LND_SERVER="192.168.1.2:10009" \
-  meedamian/lndash:latest
+  djmelik/lndash:latest
 ```
 
 And open http://localhost:8000 in your browser.

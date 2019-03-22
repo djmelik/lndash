@@ -28,7 +28,7 @@ script:
       black --check *.py config/*.py
 
     elif  [ "${VARIANT}" = "docker" ]; then
-      image="meedamian/lndash"
+      image="djmelik/lndash"
 
       docker build --no-cache -t "${image}:latest" .
 
