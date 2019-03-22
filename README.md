@@ -66,32 +66,59 @@ gunicorn main:app -b 0.0.0.0:8080
 
 ## Docker
 
-### Building the docker container
+Four things need to be configured on the host to run the `lndash` docker container:
+
+  1. The path to the TLS certificate (ex. `$HOME/.lnd/tls.cert`)
+  1. The path to the readonly macaroon (ex. `$HOME/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon`)
+  1. The port on which the web app should listen (ex. `8000`)
+  1. The LND server's RPC address (ex. `192.168.1.2:10009`)
+
+### The easy way
+
+Run the following command in your terminal (replace all local paths with your own):
+
+```sh
+docker run -d --rm \
+  -v=$HOME/.lnd/tls.cert:/usr/src/app/config/tls.cert \
+  -v=$HOME/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon:/usr/src/app/config/readonly.macaroon \
+  -p 8000:8000 \
+  -e LNDASH_LND_SERVER="192.168.1.2:10009" \
+  meedamian/lndash:latest
+```
+
+And open http://localhost:8000 in your browser.
+
+> **Protip:** You can skip `-d` in the command above to get all the logs in your terminal.
+
+### The manual way
+
+#### Build the docker container
 
 Run the following command in the `lndash` directory:
 
-```
+```sh
 docker build -t lndash:latest .
 ```
 
 This will build the docker container and give it the tag `lndash`.
 
-### Running the docker container
 
-Three things need to be configured to run the `lndash` docker container.
+#### Run the built container
 
-1. The path to the TLS certificate
-2. The path to the readonly macaroon
-3. The port on which the web app should listen
-4. The LND server's RPC addres
+Run the following command in your terminal:
 
-These can all be configured via the docker command line, as follows:
-
+```sh
+docker run -d --restart \
+  -v=$HOME/.lnd/tls.cert:/usr/src/app/config/tls.cert \
+  -v=$HOME/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon:/usr/src/app/config/readonly.macaroon \
+  -p 8000:8000 \
+  -e LNDASH_LND_SERVER="192.168.1.2:10009" \
+  lndash:latest
 ```
-docker run -d --restart -v=$HOME/.lnd/tls.cert:/usr/src/app/config/tls.cert -v=$HOME/.lnd/data/chain/bitcoin/mainnet/readonly.macaroon:/usr/src/app/config/readonly.macaroon -p 80:8000 -e LNDASH_LND_SERVER="192.168.1.2:10009" lndash:latest
-```
 
-The above command line assumes `tls.cert` and `readonly.macaroon` are stored at these locations and that the LND server is available on port 10009 at IP address 192.168.1.2. It makes the `lndash` server available on port 80. Change these values as needed.
+The above command line assumes `tls.cert` and `readonly.macaroon` are stored at these locations and that the LND server is available on port 10009 at IP address 192.168.1.2. It makes the `lndash` server available on port 8000. Change these values as needed.
+
+Now you can open http://localhost:8000 in your browser.
 
 ## Nginx reverse proxy
 
