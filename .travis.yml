@@ -1,19 +1,43 @@
+dist: xenial
+
+sudo: required
+
+services:
+  - docker
+
+env:
+  matrix:
+    - VARIANT=test
+    - VARIANT=docker
+
 language: python
-
-sudo: false
-
-# Saves pip downloads/wheels between builds
-cache:
-  directories:
-    - $HOME/.cache/pip
-
 python:
   - "3.6"
 
 install:
-    - pip install black
-    - pip install -r requirements.txt
+  - >
+    if [ "${VARIANT}" = "test" ]; then
+      pip install black
+      pip install -r requirements.txt
+    fi
 
 script:
-    - python -m compileall .
-    - black --check *.py config/*.py
+  - >
+    if [ "${VARIANT}" = "test" ]; then
+      python -m compileall .
+      black --check *.py config/*.py
+
+    elif  [ "${VARIANT}" = "docker" ]; then
+      image="meedamian/lndash"
+
+      docker build --no-cache -t "${image}:latest" .
+
+      travis_retry timeout 5m echo "${DOCKER_PASS}" | docker login -u="${DOCKER_USER}" --password-stdin
+
+      docker push "${image}:latest"
+
+      if [ -n "${TRAVIS_TAG}" ]; then
+        docker tag "${image}:latest" "${image}:${TRAVIS_TAG}"
+        docker push "${image}:${TRAVIS_TAG}"
+      fi
+    fi
