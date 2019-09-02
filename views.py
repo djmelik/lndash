@@ -332,7 +332,7 @@ def events():
 
     events_response = stub.ForwardingHistory(
         ln.ForwardingHistoryRequest(
-            start_time=0,
+            start_time=1,
             end_time=int(time.time()),
             index_offset=0,
             num_max_events=100000,
