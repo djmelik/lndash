@@ -180,7 +180,7 @@ def channels():
     }
 
     peers_response = stub.ListPeers(ln.ListPeersRequest())
-    channels_response = stub.ListChannels(ln.ListChannelsRequest(active_only=True))
+    channels_response = stub.ListChannels(ln.ListChannelsRequest(active_only=False))
 
     for peer in peers_response.peers:
         try:
@@ -189,9 +189,13 @@ def channels():
             )
             node_alias = node_info_response.node.alias
             node_color = node_info_response.node.color
+            node_num_channels = node_info_response.num_channels
+            node_capacity = node_info_response.total_capacity
         except grpc.RpcError:
             node_alias = ""
             node_color = ""
+            node_channels = 0
+            node_capacity = 0
 
         peers.append(
             {
@@ -204,6 +208,8 @@ def channels():
                 "sats_sent": peer.sat_sent,
                 "sats_received": peer.sat_recv,
                 "ping_time": peer.ping_time,
+                "num_channels": node_num_channels,
+                "capacity": node_capacity,
                 "channels": [],
             }
         )
@@ -213,7 +219,11 @@ def channels():
 
     for channel in channels_response.channels:
         peer_filter = [x for x in peers if x["pub_key"] == channel.remote_pubkey]
-        index = peers.index(peer_filter[0])
+        try:
+            index = peers.index(peer_filter[0])
+        except IndexError as e:
+            # continue if channel is inactive due to disconnected peer
+            continue
 
         scatterPlotCapacity["ids"].append(channel.chan_id)
         scatterPlotCapacity["y"].append(int(channel.capacity))
@@ -271,6 +281,7 @@ def channels():
         peers[index]["channels"].append(
             {
                 "active": channel.active,
+                "private": channel.private,
                 "chan_id": channel.chan_id,
                 "capacity": channel.capacity,
                 "commit_fee": channel.commit_fee,
