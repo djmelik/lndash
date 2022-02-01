@@ -31,7 +31,7 @@ stub = lnrpc.LightningStub(channel)
 
 @blueprint.route("/query", methods=["GET", "POST"])
 def query():
-    nodes = stub.DescribeGraph(ln.ChannelGraphRequest()).nodes
+    nodes = stub.DescribeGraph(ln.ChannelGraphRequest(include_unannounced=False)).nodes
 
     content = {"nodes": nodes, "node_count": len(nodes), "routes": []}
 
@@ -342,7 +342,7 @@ def events():
     for event in events_response.forwarding_events:
         tx_date = datetime.datetime.fromtimestamp(event.timestamp).strftime("%Y-%m-%d")
         tx_size = event.amt_out
-        tx_fee = event.fee
+        tx_fee = event.fee_msat / 1000
 
         events_filter = [x for x in events if x["date"] == tx_date]
         if len(events_filter) > 0:
@@ -408,9 +408,18 @@ def lightning_map():
 @blueprint.route("/map_data")
 @cache.cached(timeout=1800)
 def map_data():
-    response = stub.DescribeGraph(ln.ChannelGraphRequest())
+    pub_keys = []
+    node_info = stub.GetInfo(ln.GetInfoRequest())
+    pub_keys.append(node_info.identity_pubkey)
+
+    peers_response = stub.ListPeers(ln.ListPeersRequest())
+
+    for peer in peers_response.peers:
+        pub_keys.append(peer.pub_key)
+
+    response = stub.DescribeGraph(ln.ChannelGraphRequest(include_unannounced=False))
     nodes = [
-        {"id": x.pub_key, "alias": x.alias, "color": x.color} for x in response.nodes
+        {"id": x.pub_key, "alias": x.alias, "color": x.color} for x in (y for y in response.nodes if y.pub_key in pub_keys)
     ]
     links = [
         {
@@ -419,7 +428,7 @@ def map_data():
             "target": x.node2_pub,
             "value": x.capacity,
         }
-        for x in response.edges
+        for x in (y for y in response.edges if y.node1_pub in pub_keys and y.node2_pub in pub_keys)
     ]
 
     map_data = {"nodes": nodes, "links": links}

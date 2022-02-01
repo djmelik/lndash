@@ -2,8 +2,8 @@ Click==7.0
 Flask==1.0.2
 Flask-Caching==1.4.0
 googleapis-common-protos==1.5.5
-grpcio==1.17.1
-grpcio-tools==1.17.1
+grpcio==1.25.0
+grpcio-tools==1.25.0
 gunicorn==19.9.0
 itsdangerous==1.1.0
 Jinja2==2.10
